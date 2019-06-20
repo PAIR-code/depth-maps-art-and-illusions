@@ -16,7 +16,6 @@
 """Backend of the depth illusion experiment demo."""
 
 import os
-
 from base64 import encodestring
 from densedepth_model.densedepth import initialize_model 
 from flask import Flask, request
