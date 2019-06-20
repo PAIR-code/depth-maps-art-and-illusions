@@ -26,6 +26,7 @@ from urlparse import unquote
 from util import get_web_image, get_dense_depth_image
 
 
+
 app = Flask(__name__, static_url_path='')
 CORS(app)
 
