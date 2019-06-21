@@ -127,6 +127,8 @@ function initializeImageCarousel() {
  * Initializes the tabs that switch between the 2D and 3D views.
  */
 function initializeTabs() {
+  // Hides the 3D viewer, shows the 2D image and image carousel, and enables
+  // the overlay feature when the 2D tab is clicked.
   document.getElementById("2D-tab").onclick = (event: Event) => {
     document.getElementById("canvas-container").style.display = "none";
     document.getElementById("focus-image").style.display = "inline-block";
@@ -142,6 +144,8 @@ function initializeTabs() {
     requestDepthImage2D();
   };
 
+  // Hides the 2D image and image carousel, shows the 3D viewer, and disables
+  // the overlay feature when the 3D tab is clicked.
   document.getElementById("3D-tab").onclick = (event: Event) => {
     document.getElementById("canvas-container").style.display = "inline-block";
     document.getElementById("focus-image").style.display = "none";
@@ -171,6 +175,8 @@ function initializeVisualizer() {
 
   viewer = new objViewer.OBJViewer(() => {requestDepthImage3D();});
 
+  // Shows the value of the pixel under the cursor when the user hovers over
+  // the depth map image or the depth map overlay.
   const depthMapHovered = (event: Event) => {
     const img = event.target;
     const canvas = document.createElement('canvas');
@@ -180,13 +186,15 @@ function initializeVisualizer() {
     const pixelData = canvas.getContext('2d').getImageData(
       event.offsetX, event.offsetY, 1, 1).data;
 
-    const pixValue = (pixelData[0] + pixelData[1] + pixelData[2]) / 3 / 255
+    const pixValue = (pixelData[0] + pixelData[1] + pixelData[2]) / 3 / 255;
 
     document.getElementById("depth-value").innerHTML = pixValue.toString();
   }
 
   document.getElementById("depth-map").onmousemove = depthMapHovered;
   document.getElementById("depth-map-overlay").onmousemove = depthMapHovered;
+
+  // Updates the opacity of the overlay when the slider value changes.
   document.getElementById("overlay-slider").addEventListener('change',
     (event: Event) => {
       const opacityValue = event.target.value / 100;
