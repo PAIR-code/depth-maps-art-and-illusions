@@ -19,11 +19,27 @@ import './index.css';
 import * as d3 from 'd3';
 import * as THREE from 'three';
 import {OBJLoader} from 'three-obj-mtl-loader';
-import { OrbitControls } from 'three-orbitcontrols-ts'; 
+import {OrbitControls} from 'three-orbitcontrols-ts';
+
+// Constants
+const BACKGROUND_COLOR = 0x222222;
+const LIGHT_COLOR = 0xff0000;
+const CAMERA_FOV = 75;
+const CAMERA_NEAR = 0.1;
+const CAMERA_FAR = 1000;
+const CAMERA_POS_Y = 0.3;
+const CAMERA_POS_Z = 3;
+const CAMERA_FOCAL_LENGTH = 60;
+const OBJ_SCALE = 0.1;
+const LIGHT_INTENSITY = 1;
+const LIGHT_DISTANCE = 100;
+const LIGHT_POS_X = 5;
+const LIGHT_POS_Y = 5;
+const LIGHT_POS_Z = 3;
 
 
 /**
- * This class creates a 3D canvas for viewing impossible object OBJs. 
+ * This class creates a 3D canvas for viewing impossible object OBJs.
  */
 export class OBJViewer {
 
@@ -47,42 +63,43 @@ export class OBJViewer {
    */
   private initializeCanvas(onCameraUpdated: () => void) {
     OBJViewer.renderer = new THREE.WebGLRenderer({
-      preserveDrawingBuffer:true
+      preserveDrawingBuffer: true
     });
 
     // onCameraUpdated updates the depth map to match the camera view
-    OBJViewer.renderer.domElement.addEventListener("mouseup", 
+    OBJViewer.renderer.domElement.addEventListener("mouseup",
       onCameraUpdated);
     document.getElementById("canvas-container").appendChild(
       OBJViewer.renderer.domElement);
 
     OBJViewer.renderer.setSize(window.innerWidth,
-    window.innerHeight);
+      window.innerHeight);
 
     // Initialize camera and orbit controls.
-    OBJViewer.camera = new THREE.PerspectiveCamera( 
-      75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    OBJViewer.camera = new THREE.PerspectiveCamera(
+      CAMERA_FOV, window.innerWidth / window.innerHeight,
+      CAMERA_NEAR, CAMERA_FAR);
     let controls = new OrbitControls(
       OBJViewer.camera, OBJViewer.renderer.domElement);
-    OBJViewer.camera.position.y = 0.3;
-    OBJViewer.camera.position.z = 3;
-    OBJViewer.camera.setFocalLength(60);
+    OBJViewer.camera.position.y = CAMERA_POS_Y;
+    OBJViewer.camera.position.z = CAMERA_POS_Z;
+    OBJViewer.camera.setFocalLength(CAMERA_FOCAL_LENGTH);
     controls.update();
 
     // Initialize scene.
     OBJViewer.scene = new THREE.Scene();
-    OBJViewer.scene.background = new THREE.Color(0x222222);
+    OBJViewer.scene.background = new THREE.Color(BACKGROUND_COLOR);
     this.addLightsAndGeometry();
   }
 
 
   /**
-   * This method is called to update the canvas at each frame. 
+   * This method is called to update the canvas at each frame.
    */
   public static animate() {
-    requestAnimationFrame(OBJViewer.animate); 
-    OBJViewer.renderer.render(OBJViewer.scene, 
-      OBJViewer.camera);     
+    requestAnimationFrame(OBJViewer.animate);
+    OBJViewer.renderer.render(OBJViewer.scene,
+      OBJViewer.camera);
   }
 
 
@@ -92,36 +109,35 @@ export class OBJViewer {
   private addLightsAndGeometry() {
     this.loadOBJ("impossible_triangle.obj");
 
-    var light = new THREE.PointLight( 0xff0000, 1, 100 );
-    light.position.set( 5,5,3 );
-    OBJViewer.scene.add( light );
+    var light = new THREE.PointLight(LIGHT_COLOR, LIGHT_INTENSITY,
+      LIGHT_DISTANCE);
+    light.position.set(LIGHT_POS_X, LIGHT_POS_Y, LIGHT_POS_Z);
+    OBJViewer.scene.add(light);
   }
-
 
   /**
    * Loads and OBJ and adds it to the scene.
    * @param path The path of the obj file to load.
    */
-  private loadOBJ(path) {
+  private loadOBJ(path: string) {
     let loader = new OBJLoader();
-    loader.load(path,         
-      function (object) {
-        object.traverse(function (child) {
+    loader.load(path,
+      (object: THREE.Group) => {
+        object.traverse((child: THREE.Mesh) => {
           if (child instanceof THREE.Mesh) {
             let depth_material = new THREE.MeshPhongMaterial();
-            child.material = depth_material 
-            child.scale.x = child.scale.y = child.scale.z = .1;
+            child.material = depth_material
+            child.scale.x = child.scale.y = child.scale.z = OBJ_SCALE;
           }
-        });  
+        });
         OBJViewer.scene.add(object);
-    },
-    function (xhr) {
-      console.log(xhr);
-      console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-    },
-    function (error) {
-      console.log('An error happened');
-    });
+      },
+      (xhr: ProgressEvent) => {
+        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+      },
+      (error: Error) => {
+        console.log('An error happened');
+      });
   }
 
 
