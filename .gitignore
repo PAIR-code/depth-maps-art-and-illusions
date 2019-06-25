@@ -1,0 +1,9 @@
+node_modules/
+npm-debug.log
+yarn-error.log
+.DS_Store
+static/
+.cache/
+*.pyc
+densedepth_model/
+util.py
