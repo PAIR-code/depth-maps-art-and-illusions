@@ -54,25 +54,6 @@ def processImage():
 	return jsonify({'message': output})
 
 
-# @app.route("/requestimages")
-# def requestImages():
-# 	"""Requests the image files to display as options for the 2D viewer.
-
-# 	Returns:
-# 		A Response with the JSON representation of the images.
-# 	"""
-# 	encoded_dataURL = request.args.get('screenshot', None)
-# 	dataURL = unquote(encoded_dataURL)
-
-# 	web_image = get_web_image(dataURL)
-# 	dense_depth_image = get_dense_depth_image(model, web_image)
-
-# 	encoded_dense_depth_image = encodestring(dense_depth_image)
-# 	output = "data:image/png;base64," + encoded_dense_depth_image
-
-# 	return jsonify({'message': output})
-
-
 if __name__ == '__main__':
 	app.run(port=3366, host='0.0.0.0', debug=True)
 
