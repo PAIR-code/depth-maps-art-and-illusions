@@ -17,7 +17,7 @@
 
 import os
 from base64 import encodestring
-from densedepth_model.densedepth import initialize_model 
+from densedepth_model.densedepth import initialize_model
 from flask import Flask, request
 from flask_cors import CORS, cross_origin
 from flask_jsonpify import jsonify
@@ -33,17 +33,14 @@ model = initialize_model()
 
 @app.route("/processImage")
 def processImage():
-	"""Processes the image's dataURL, decoding it into an image, 
+	"""Processes the image's dataURL, decoding it into an image,
 	sending the image through DenseDepth to generate a depth map,
 	and sending the dataURL of the depth map as the response to
 	the client.
 
-	Args:
-		builder: transform_builder.Builder.
-		
 	Returns:
 		A Response with the JSON representation of the depth map
-		image's dataURL. 
+		image's dataURL.
 	"""
 	encoded_dataURL = request.args.get('screenshot', None)
 	dataURL = unquote(encoded_dataURL)
@@ -55,6 +52,26 @@ def processImage():
 	output = "data:image/png;base64," + encoded_dense_depth_image
 
 	return jsonify({'message': output})
+
+
+# @app.route("/requestimages")
+# def requestImages():
+# 	"""Requests the image files to display as options for the 2D viewer.
+
+# 	Returns:
+# 		A Response with the JSON representation of the images.
+# 	"""
+# 	encoded_dataURL = request.args.get('screenshot', None)
+# 	dataURL = unquote(encoded_dataURL)
+
+# 	web_image = get_web_image(dataURL)
+# 	dense_depth_image = get_dense_depth_image(model, web_image)
+
+# 	encoded_dense_depth_image = encodestring(dense_depth_image)
+# 	output = "data:image/png;base64," + encoded_dense_depth_image
+
+# 	return jsonify({'message': output})
+
 
 if __name__ == '__main__':
 	app.run(port=3366, host='0.0.0.0', debug=True)

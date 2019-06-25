@@ -5,3 +5,5 @@ yarn-error.log
 static/
 .cache/
 *.pyc
+densedepth_model/
+util.py
