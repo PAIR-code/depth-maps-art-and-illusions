@@ -109,16 +109,16 @@ function displayResult(imageurl: string) {
  * @param imageSource a string containing the image source.
  */
 function addCarouselItem(imageSource: string) {
-  let listItem = document.createElement("li");
+  const listItem = document.createElement("li");
   listItem.className = "mdl-list__item";
-  let span = document.createElement("span");
+  const span = document.createElement("span");
   span.className = "mdl-list__item-primary-content";
 
-  let carouselImageContainer = document.createElement("div");
+  const carouselImageContainer = document.createElement("div");
   carouselImageContainer.className = "carousel-image-container";
   carouselImageContainer.onclick = carouselImageClicked;
 
-  let carouselImage = document.createElement("img");
+  const carouselImage = document.createElement("img");
   carouselImage.src = imageSource;
   carouselImage.className = "carousel-image";
 
@@ -181,9 +181,8 @@ function carouselImageClicked(event: Event) {
 function initializeImageCarousel() {
   const carouselImageContainers = document.getElementsByClassName(
     "carousel-image");
-  for (let i = 0; i < carouselImageContainers.length; i++) {
-    carouselImageContainers[i].onclick = carouselImageClicked;
-  }
+  Array.from(carouselImageContainers).forEach(container =>
+    container.onclick = carouselImageClicked)
 }
 
 
@@ -201,9 +200,8 @@ function initializeTabs() {
 
     const carouselImages = document.getElementsByClassName(
       "carousel-image-container");
-    for (let i = 0; i < carouselImages.length; i++) {
-      carouselImages[i].style.display = "block";
-    }
+    Array.from(carouselImages).forEach((carouselImage) =>
+      carouselImage.style.display = "block");
 
     requestDepthImage2D();
   };
@@ -221,9 +219,8 @@ function initializeTabs() {
 
     const carouselImages = document.getElementsByClassName(
       "carousel-image-container");
-    for (let i = 0; i < carouselImages.length; i++) {
-      carouselImages[i].style.display = "none";
-    }
+    Array.from(carouselImages).forEach((carouselImage) =>
+      carouselImage.style.display = "none");
 
     requestDepthImage3D();
   };
