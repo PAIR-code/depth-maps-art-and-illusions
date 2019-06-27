@@ -18,40 +18,46 @@
 import os
 from base64 import encodestring
 from densedepth_model.densedepth import initialize_model
-from flask import Flask, request
+from flask import Flask, request, render_template
 from flask_cors import CORS, cross_origin
 from flask_jsonpify import jsonify
 from urlparse import unquote
 from util import get_web_image, get_dense_depth_image
 
 
-
-app = Flask(__name__, static_url_path='')
+app = Flask(__name__, static_url_path='', template_folder='')
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024 # 16mb
 CORS(app)
 
 model = initialize_model()
 
-@app.route("/processImage")
+@app.route('/')
+def index():
+  """Displays the index page accessible at '/'."""
+  return render_template('static/index.html')
+
+
+@app.route("/processImage", methods=['POST'])
 def processImage():
-	"""Processes the image's dataURL, decoding it into an image,
-	sending the image through DenseDepth to generate a depth map,
-	and sending the dataURL of the depth map as the response to
-	the client.
+  """Processes the image's dataURL, decoding it into an image,
+  sending the image through DenseDepth to generate a depth map,
+  and sending the dataURL of the depth map as the response to
+  the client.
 
-	Returns:
-		A Response with the JSON representation of the depth map
-		image's dataURL.
-	"""
-	encoded_dataURL = request.args.get('screenshot', None)
-	dataURL = unquote(encoded_dataURL)
+  Returns:
+    A Response with the JSON representation of the depth map
+    image's dataURL.
+  """
+  # encoded_dataURL = request.args.get('screenshot', None)
+  dataURL = unquote(request.data)
 
-	web_image = get_web_image(dataURL)
-	dense_depth_image = get_dense_depth_image(model, web_image)
+  web_image = get_web_image(dataURL)
+  dense_depth_image = get_dense_depth_image(model, web_image)
 
-	encoded_dense_depth_image = encodestring(dense_depth_image)
-	output = "data:image/png;base64," + encoded_dense_depth_image
+  encoded_dense_depth_image = encodestring(dense_depth_image)
+  output = "data:image/png;base64," + encoded_dense_depth_image
 
-	return jsonify({'message': output})
+  return jsonify({'message': output})
 
 
 if __name__ == '__main__':

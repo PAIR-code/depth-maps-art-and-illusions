@@ -4119,6 +4119,11 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
+keras@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/keras/-/keras-1.0.1.tgz#51cbf15de2a24105a0fa1cb2d16b94ea8b13e1c6"
+  integrity sha1-UcvxXeKiQQWg+hyy0WuU6osT4cY=
+
 kind-of@^3.0.2, kind-of@^3.0.3, kind-of@^3.2.0:
   version "3.2.2"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-3.2.2.tgz#31ea21a734bab9bbb0f32466d893aea51e4a3c64"

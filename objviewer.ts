@@ -42,7 +42,6 @@ const LIGHT_POS_Z = 3;
  * This class creates a 3D canvas for viewing impossible object OBJs.
  */
 export class OBJViewer {
-
   static renderer: THREE.WebGLRenderer;
   static camera: THREE.PerspectiveCamera;
   static scene: THREE.Scene;
@@ -62,25 +61,21 @@ export class OBJViewer {
    * the renderer, camera, and scene.
    */
   private initializeCanvas(onCameraUpdated: () => void) {
-    OBJViewer.renderer = new THREE.WebGLRenderer({
-      preserveDrawingBuffer: true
-    });
+    OBJViewer.renderer = new THREE.WebGLRenderer({preserveDrawingBuffer: true});
 
     // onCameraUpdated updates the depth map to match the camera view
-    OBJViewer.renderer.domElement.addEventListener("mouseup",
-      onCameraUpdated);
-    document.getElementById("canvas-container").appendChild(
-      OBJViewer.renderer.domElement);
+    OBJViewer.renderer.domElement.addEventListener('mouseup', onCameraUpdated);
+    document.getElementById('canvas-container')
+        .appendChild(OBJViewer.renderer.domElement);
 
-    OBJViewer.renderer.setSize(window.innerWidth,
-      window.innerHeight);
+    OBJViewer.renderer.setSize(window.innerWidth, window.innerHeight);
 
     // Initialize camera and orbit controls.
     OBJViewer.camera = new THREE.PerspectiveCamera(
-      CAMERA_FOV, window.innerWidth / window.innerHeight,
-      CAMERA_NEAR, CAMERA_FAR);
-    let controls = new OrbitControls(
-      OBJViewer.camera, OBJViewer.renderer.domElement);
+        CAMERA_FOV, window.innerWidth / window.innerHeight, CAMERA_NEAR,
+        CAMERA_FAR);
+    let controls =
+        new OrbitControls(OBJViewer.camera, OBJViewer.renderer.domElement);
     OBJViewer.camera.position.y = CAMERA_POS_Y;
     OBJViewer.camera.position.z = CAMERA_POS_Z;
     OBJViewer.camera.setFocalLength(CAMERA_FOCAL_LENGTH);
@@ -98,8 +93,7 @@ export class OBJViewer {
    */
   public static animate() {
     requestAnimationFrame(OBJViewer.animate);
-    OBJViewer.renderer.render(OBJViewer.scene,
-      OBJViewer.camera);
+    OBJViewer.renderer.render(OBJViewer.scene, OBJViewer.camera);
   }
 
 
@@ -107,10 +101,10 @@ export class OBJViewer {
    * Adds lights and geometry to the scene.
    */
   private addLightsAndGeometry() {
-    this.loadOBJ("impossible_triangle.obj");
+    this.loadOBJ('impossible_triangle.obj');
 
-    var light = new THREE.PointLight(LIGHT_COLOR, LIGHT_INTENSITY,
-      LIGHT_DISTANCE);
+    var light =
+        new THREE.PointLight(LIGHT_COLOR, LIGHT_INTENSITY, LIGHT_DISTANCE);
     light.position.set(LIGHT_POS_X, LIGHT_POS_Y, LIGHT_POS_Z);
     OBJViewer.scene.add(light);
   }
@@ -121,23 +115,25 @@ export class OBJViewer {
    */
   private loadOBJ(path: string) {
     let loader = new OBJLoader();
-    loader.load(path,
-      (object: THREE.Group) => {
-        object.traverse((child: THREE.Mesh) => {
-          if (child instanceof THREE.Mesh) {
-            let depth_material = new THREE.MeshPhongMaterial();
-            child.material = depth_material
-            child.scale.x = child.scale.y = child.scale.z = OBJ_SCALE;
-          }
+    loader.setPath('../objs/');
+    loader.load(
+        path,
+        (object: THREE.Group) => {
+          object.traverse((child: THREE.Mesh) => {
+            if (child instanceof THREE.Mesh) {
+              let depth_material = new THREE.MeshPhongMaterial();
+              child.material = depth_material
+              child.scale.x = child.scale.y = child.scale.z = OBJ_SCALE;
+            }
+          });
+          OBJViewer.scene.add(object);
+        },
+        (xhr: ProgressEvent) => {
+          console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+        },
+        (error: Error) => {
+          console.log('An error happened');
         });
-        OBJViewer.scene.add(object);
-      },
-      (xhr: ProgressEvent) => {
-        console.log((xhr.loaded / xhr.total * 100) + '% loaded');
-      },
-      (error: Error) => {
-        console.log('An error happened');
-      });
   }
 
 
@@ -146,8 +142,8 @@ export class OBJViewer {
    * to the backend and displaying the generated depth map.
    */
   public getCanvasDataURL() {
-    const imageurl = encodeURIComponent(
-      OBJViewer.renderer.domElement.toDataURL());
+    const imageurl =
+        encodeURIComponent(OBJViewer.renderer.domElement.toDataURL());
     return imageurl;
   }
 }
