@@ -105,21 +105,84 @@ function displayResult(imageurl: string) {
 
 
 /**
+ * Adds an image to the image carousel containing the given image source.
+ * @param imageSource a string containing the image source.
+ */
+function addCarouselItem(imageSource: string) {
+  const listItem = document.createElement("li");
+  listItem.className = "mdl-list__item";
+  const span = document.createElement("span");
+  span.className = "mdl-list__item-primary-content";
+
+  const carouselImageContainer = document.createElement("div");
+  carouselImageContainer.className = "carousel-image-container";
+  carouselImageContainer.onclick = carouselImageClicked;
+
+  const carouselImage = document.createElement("img");
+  carouselImage.src = imageSource;
+  carouselImage.className = "carousel-image";
+
+  carouselImageContainer.appendChild(carouselImage);
+
+  span.appendChild(carouselImageContainer);
+  listItem.appendChild(span);
+
+  const carouselList = document.getElementById("carousel-list");
+  carouselList.insertBefore(listItem, carouselList.childNodes[0]);
+}
+
+
+/**
+ * Displays the images on the file input on the image carousel.
+ * @param event the Event that was triggered by the user.
+ */
+function uploadInputChanged(event: Event) {
+  const files = document.querySelector('input[type=file]').files;
+
+  const displayImageFile = (file: File) => {
+    if (/\.(jpe?g|png|gif)$/i.test(file.name)) {
+      const reader = new FileReader();
+
+      reader.addEventListener("load", function () {
+        addCarouselItem(reader.result);
+      }, false);
+
+      reader.readAsDataURL(file);
+    }
+  };
+
+  if (files) {
+    [].forEach.call(files, displayImageFile);
+  }
+
+  // Scroll the carousel to the top, where uploaded images appear.
+  document.getElementById("carousel-container").scrollTop = 0;
+};
+
+
+/**
+ * This function is called when a carousel image is clicked. It sets the
+ * clicked image as the image in the viewer and updates the depth map viewer.
+ * @param event the Event that was triggered by the user.
+ */
+function carouselImageClicked(event: Event) {
+  const clickImage = event.target;
+  const focusImage = document.getElementById("focus-image");
+  const depthImage = document.getElementById("depth-map");
+  focusImage.src = clickImage.src;
+  depthImage.src = "";
+  requestDepthImage2D();
+}
+
+
+/**
  * Initializes the image carousel in the left sidebar.
  */
 function initializeImageCarousel() {
   const carouselImageContainers = document.getElementsByClassName(
     "carousel-image");
-  for (let i = 0; i < carouselImageContainers.length; i++) {
-    carouselImageContainers[i].onclick = (event: Event) => {
-      const clickImage = event.target;
-      const focusImage = document.getElementById("focus-image");
-      const depthImage = document.getElementById("depth-map");
-      focusImage.src = clickImage.src;
-      depthImage.src = "";
-      requestDepthImage2D();
-    }
-  }
+  Array.from(carouselImageContainers).forEach(container =>
+    container.onclick = carouselImageClicked)
 }
 
 
@@ -137,9 +200,8 @@ function initializeTabs() {
 
     const carouselImages = document.getElementsByClassName(
       "carousel-image-container");
-    for (let i = 0; i < carouselImages.length; i++) {
-      carouselImages[i].style.display = "block";
-    }
+    Array.from(carouselImages).forEach((carouselImage) =>
+      carouselImage.style.display = "block");
 
     requestDepthImage2D();
   };
@@ -157,9 +219,8 @@ function initializeTabs() {
 
     const carouselImages = document.getElementsByClassName(
       "carousel-image-container");
-    for (let i = 0; i < carouselImages.length; i++) {
-      carouselImages[i].style.display = "none";
-    }
+    Array.from(carouselImages).forEach((carouselImage) =>
+      carouselImage.style.display = "none");
 
     requestDepthImage3D();
   };
@@ -189,7 +250,7 @@ function initializeVisualizer() {
     const pixValue = (pixelData[0] + pixelData[1] + pixelData[2]) / 3 / 255;
 
     document.getElementById("depth-value").innerHTML = pixValue.toString();
-  }
+  };
 
   document.getElementById("depth-map").onmousemove = depthMapHovered;
   document.getElementById("depth-map-overlay").onmousemove = depthMapHovered;
@@ -202,7 +263,12 @@ function initializeVisualizer() {
         opacityValue.toString());
     }
   );
+  // Requests depth map from model and updates viewer
   requestDepthImage2D();
+
+  // Initialize upload button
+  document.getElementById("upload-input").onchange = uploadInputChanged;
 }
+
 
 initializeVisualizer();
