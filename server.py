@@ -48,7 +48,6 @@ def processImage():
     A Response with the JSON representation of the depth map
     image's dataURL.
   """
-  # encoded_dataURL = request.args.get('screenshot', None)
   dataURL = unquote(request.data)
 
   web_image = get_web_image(dataURL)
