@@ -1,7 +1,7 @@
 node_modules/
-npm-debug.log
-yarn-error.log
-.DS_Store
+*/npm-debug.log
+*/yarn-error.log
+*/.DS_Store
 */static/*.html
 */static/*.js
 */static/*.css
@@ -9,7 +9,7 @@ yarn-error.log
 .cache/
 *.pyc
 densedepth_model/
-util.py
+depth_visualizer/util.py
 adversarial/adversarial_example.py
 adversarial/layers.py
 adversarial/loss.py
