@@ -2,10 +2,10 @@ node_modules/
 npm-debug.log
 yarn-error.log
 .DS_Store
-static/*.html
-static/*.js
-static/*.css
-static/*.map
+*/static/*.html
+*/static/*.js
+*/static/*.css
+*/static/*.map
 .cache/
 *.pyc
 densedepth_model/

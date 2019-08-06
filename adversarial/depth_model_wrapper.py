@@ -13,7 +13,30 @@
 # limitations under the License.
 # ==============================================================================
 
-"""Abstract Wrapper class for the depth model for generating adversarial examples."""
+"""Abstract Wrapper class for the depth model for generating adversarial examples.
+
+  Example Usage:
+
+    class MyDepthModelWrapper(object):
+      def load_image(self, filepath):
+        # my code
+
+      def initialize_model(self):
+        # my code
+
+      def predict(self, model, image, batch_size=2):
+        # my code
+
+      def get_final_layer(self, model):
+        # my code
+
+    DepthModelWrapper.register(MyDepthModelWrapper)
+
+    myDepthModelWrapper = MyDepthModelWrapper()
+    adversarial_depth.generate_adversarial_example(myDepthModelWrapper, iterations=1)
+
+"""
+
 
 import abc
 

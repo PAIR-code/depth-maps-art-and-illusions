@@ -23,12 +23,9 @@ from matplotlib import pyplot as plt
 from PIL import Image
 
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '5'
-
-
 # Image Paths
-SINK_IMAGE = "/usr/local/google/home/ellenj/Documents/BigPicture/DenseDepth/examples/1_image.png"
-BATHTUB_IMAGE = "/usr/local/google/home/ellenj/Documents/BigPicture/DenseDepth/examples/11_image.png"
+SINK_IMAGE = "images/sink.png"
+BATHTUB_IMAGE = "images/bathtub.png"
 
 
 def get_sink_to_bathtub_inputs(depth_model_wrapper, model):
@@ -97,20 +94,20 @@ def display(depth_model_wrapper, model, original_image, altered_image):
   display_image(altered_output)
 
 
-def retrieve_loss_and_gradients(input_image):
+def retrieve_loss_and_gradients(input_image, loss_gradient_function):
   """Retrieves the adversarial loss and gradients from the model.
 
 	Args:
 		input_image: A numpy array containing the input image used to generate the
         adversarial example.
 	"""
-  results = get_loss_and_gradients([input_image])
+  results = loss_gradient_function([input_image])
   loss = results[0]
   gradients = results[1]
   return loss, gradients
 
 
-def gradient_ascent(input_image, iterations, step_size):
+def gradient_ascent(input_image, loss_gradient_function, iterations, step_size):
   """Runs gradient ascent on the input image, altering it into an adversarial
       example.
 
@@ -122,8 +119,8 @@ def gradient_ascent(input_image, iterations, step_size):
 
 	"""
   for i in range(iterations):
-      loss, gradients = retrieve_loss_and_gradients(input_image)
-      print('Loss at', i, ':', loss)
+      loss, gradients = retrieve_loss_and_gradients(input_image, loss_gradient_function)
+      print('Loss at %d: %.3f' % (i, loss))
       input_image -= step_size * gradients
   return input_image
 
@@ -153,13 +150,13 @@ def generate_adversarial_example(depth_model_wrapper, iterations = 100,
   gradients = K.gradients(loss, model.input)[0]
   gradients /= K.maximum(K.mean(K.abs(gradients)), K.epsilon())  # normalize
 
-  global get_loss_and_gradients
   get_loss_and_gradients = K.function([model.input], [loss, gradients])
 
 
   # Run gradient ascent on image input.
   original_image = input_image.copy()
-  altered_image = gradient_ascent(input_image, iterations, step_size)
+  altered_image = gradient_ascent(input_image, get_loss_and_gradients,
+    iterations, step_size)
 
   # Display results
   display(depth_model_wrapper, model, original_image, altered_image)
