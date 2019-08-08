@@ -28,8 +28,11 @@ SINK_IMAGE = "images/sink.png"
 BATHTUB_IMAGE = "images/bathtub.png"
 
 
-def get_sink_to_bathtub_inputs(depth_model_wrapper, model):
-  """Gets the input and target output for the sink to bathtub experiment.
+def get_inputs(depth_model_wrapper, model, input_path,
+    target_path):
+  """Gets the input and target output for the sink to bathtub experiment, which
+      alters an input image of a sink towards producing the depth map output of
+      a bathtub.
 
 	Args:
 		depth_model_wrapper: A DepthModelWrapper instance that initializes the model
@@ -38,9 +41,14 @@ def get_sink_to_bathtub_inputs(depth_model_wrapper, model):
 	Returns:
 		The input image and target depth output.
 	"""
-  input_image = depth_model_wrapper.load_image(SINK_IMAGE)
+  if input_path is None:
+    input_path = SINK_IMAGE
+  if target_path is None:
+    target_path = BATHTUB_IMAGE
+
+  input_image = depth_model_wrapper.load_image(input_path)
   target_depth_output = depth_model_wrapper.predict(
-    model, depth_model_wrapper.load_image(BATHTUB_IMAGE))
+    model, depth_model_wrapper.load_image(target_path))
   return input_image, target_depth_output
 
 
@@ -119,14 +127,15 @@ def gradient_ascent(input_image, loss_gradient_function, iterations, step_size):
 
 	"""
   for i in range(iterations):
-      loss, gradients = retrieve_loss_and_gradients(input_image, loss_gradient_function)
+      loss, gradients = retrieve_loss_and_gradients(input_image,
+          loss_gradient_function)
       print('Loss at %d: %.3f' % (i, loss))
       input_image -= step_size * gradients
   return input_image
 
 
 def generate_adversarial_example(depth_model_wrapper, iterations = 100,
-  step_size = 0.001):
+  step_size = 0.001, input_path=None, target_path=None):
   """Displays the original input image and depth output and the altered input
     image and depth output
 
@@ -139,8 +148,8 @@ def generate_adversarial_example(depth_model_wrapper, iterations = 100,
   K.set_learning_phase(0)
   model = depth_model_wrapper.initialize_model()
 
-  input_image, goal_output = get_sink_to_bathtub_inputs(
-    depth_model_wrapper, model)
+  input_image, goal_output = get_inputs(depth_model_wrapper, model,
+      input_path, target_path)
 
   # Set up loss function.
   final_layer_output = depth_model_wrapper.get_final_layer(model)
