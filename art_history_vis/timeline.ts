@@ -20,13 +20,16 @@ import * as THREE from 'three';
 
 // Constants
 const BLOCK_WIDTH = 0.3;
-const DEFAULT_COLORS = [0xB165D4, 0xB165D4, 0xB165D4];
+const PAINTING_COLORS = [0xB165D4, 0xB165D4, 0xB165D4];
+const PAINTING_OPACITY = 0.2;
 const GRAPH_START_YEAR = 1000;
 const GRAPH_END_YEAR = 2020;
+const MAX_PAINTINGS_PER_YEAR = 20;
+const DEPTH_SCALE_FACTOR = 0.02;
 
 
 /**
-* This class creates a 3D canvas for viewing impossible object OBJs.
+* Represents a single painting from the GAC dataset.
 */
 export interface Painting {
   year: number;
@@ -35,7 +38,7 @@ export interface Painting {
 }
 
 /**
- * This class creates a 3D canvas for viewing impossible object OBJs.
+ * This class contains the paintings of the art history timeline.
  */
 export class Timeline {
 
@@ -44,9 +47,10 @@ export class Timeline {
   isHidden: boolean;
   paintingsData: Array<Painting>;
 
-
   /**
    * The constructor for the Viewer class.
+   * @param scene the three.js scene the timeline gets added to.
+   * @param paintings an Array of Painting objects.
    */
   constructor(scene: THREE.Scene, paintings: Array<Painting>) {
     this.scene = scene;
@@ -56,7 +60,11 @@ export class Timeline {
     this.buildGraphVisualization(paintings);
   }
 
-
+  /**
+   * Gets a list of paintings lists, with a list of paintings for each year.
+   * @param paintings an Array of Painting objects.
+   * @returns a list of list of Paintings.
+   */
   private getPaintingsByYear(paintings: Array<Painting>): Painting[][] {
     const paintingsByYear = [];
 
@@ -65,7 +73,7 @@ export class Timeline {
       if (!(currYear in paintingsByYear)) {
         paintingsByYear[currYear] = [];
       }
-      if (paintingsByYear[currYear].length < 20 /*&& paintings[i].style != ''*/) {
+      if (paintingsByYear[currYear].length < MAX_PAINTINGS_PER_YEAR) {
         paintingsByYear[currYear].push(paintings[i]);
       }
     }
@@ -75,49 +83,65 @@ export class Timeline {
 
   /**
    * Builds the graph visualization from art history painting data.
+   * @param paintings an Array of Painting objects.
    */
   private buildGraphVisualization(paintings: Array<Painting>) {
-    const range = GRAPH_END_YEAR - GRAPH_START_YEAR;
     const offset = (GRAPH_END_YEAR - GRAPH_START_YEAR) / 2.0;
-
-    const counts = Array<number>(range).fill(0);
-
     const paintingsByYear = this.getPaintingsByYear(paintings);
-
 
     for (let year in paintingsByYear) {
       const curr_paintings = paintingsByYear[year];
-
       curr_paintings.sort((a, b) => b.depth - a.depth);
 
       for (let i = 0; i < curr_paintings.length; i++) {
         const currYear = curr_paintings[i].year;
-        const styles = curr_paintings[i].style.split(', ');
-
-        //&& counts[currYear - GRAPH_START_YEAR] < 50
-        if (currYear >= GRAPH_START_YEAR && currYear <= GRAPH_END_YEAR &&
-          curr_paintings[i].depth != '') {
-          const width = BLOCK_WIDTH;
-          const height = BLOCK_WIDTH;
-          const depth = BLOCK_WIDTH * curr_paintings[i].depth / 60.0;
-
-          const geometry = new THREE.BoxBufferGeometry(width, height, depth);
-          const deltaX = (currYear - GRAPH_START_YEAR - offset) * BLOCK_WIDTH;
-          const deltaZ = -depth / 2.0;
-          const deltaY = i * BLOCK_WIDTH;
-
-          geometry.translate(deltaX, deltaY, deltaZ);
-          var material = new THREE.MeshLambertMaterial({
-            color: DEFAULT_COLORS[i % 3]
+        if (this.inGraphBounds(currYear)) {
+          const geometry = this.makePaintingGeometry(curr_paintings[i], i, offset, currYear);
+          const material = new THREE.MeshLambertMaterial({
+            color: PAINTING_COLORS[i % PAINTING_COLORS.length],
+            opacity: PAINTING_OPACITY,
+            transparent: true
           });
-          material.opacity = .2;
-          material.transparent = true;
-          var cube = new THREE.Mesh(geometry, material);
+
+          const cube = new THREE.Mesh(geometry, material);
           this.paintingsGroup.add(cube);
         }
       }
     }
     this.scene.add(this.paintingsGroup);
+  }
+
+
+  /**
+   * Checks whether a year is within the start and end years of the graph.
+   * @param year the year to be checked.
+   * @returns a boolean that is whether the year is in the graph.
+   */
+  private inGraphBounds(year: number): boolean {
+    return year >= GRAPH_START_YEAR && year <= GRAPH_END_YEAR;
+  }
+
+  /**
+   * Makes the BoxBufferGeometry for the given painting.
+   * @param painting a Painting object to be represented by the mesh.
+   * @param index a number that is the index of this painting in its 'year' list.
+   * @param offset a number that is the 'x' offset of the timeline geometry.
+   * @param year a number that is the year of the painting object.
+   * @returns the BoxBufferGeometry of the Painting.
+   */
+  private makePaintingGeometry(painting: Painting, index: number,
+    offset: number, year: number): THREE.BoxBufferGeometry {
+    const width = BLOCK_WIDTH;
+    const height = BLOCK_WIDTH;
+    const depth = BLOCK_WIDTH * painting.depth * DEPTH_SCALE_FACTOR;
+    const geometry = new THREE.BoxBufferGeometry(width, height, depth);
+
+    const deltaX = (year - GRAPH_START_YEAR - offset) * BLOCK_WIDTH;
+    const deltaY = index * BLOCK_WIDTH;
+    const deltaZ = -(depth / 2.0);
+    geometry.translate(deltaX, deltaY, deltaZ);
+
+    return geometry;
   }
 
   /**
@@ -140,6 +164,4 @@ export class Timeline {
       this.isHidden = true;
     }
   }
-
-
 }

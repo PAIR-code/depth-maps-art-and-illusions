@@ -15,8 +15,6 @@
  * =============================================================================
  */
 
-import './index.css';
-
 import * as THREE from 'three';
 import * as timeline from './timeline';
 import {OrbitControls} from 'three-orbitcontrols-ts';
@@ -37,20 +35,19 @@ const HEM_SKY_COLOR = 0xffffbb;
 const HEM_GROUND_COLOR = 0x080820;
 
 
-
 /**
- * This class creates a 3D canvas for viewing impossible object OBJs.
+ * This class sets up the three.js scene and instantiates the timeline.
  */
 export class TimelineCanvas {
 
   static renderer: THREE.WebGLRenderer;
   static camera: THREE.PerspectiveCamera;
   static scene: THREE.Scene;
-
   static timeline: timeline.Timeline;
 
   /**
    * The constructor for the TimelineCanvas class.
+   * @param paintings an Array of Painting objects.
    */
   constructor(paintings: Array<timeline.Painting>) {
     this.initializeCanvas();
@@ -61,7 +58,6 @@ export class TimelineCanvas {
 
     TimelineCanvas.animate();
   }
-
 
   /**
    * Initializes the main THREE.js components of the visualizer:
@@ -87,7 +83,6 @@ export class TimelineCanvas {
     TimelineCanvas.scene.background = new THREE.Color(BACKGROUND_COLOR);
   }
 
-
   /**
    * Initializes orbit controls to control the scene's perspective camera.
    */
@@ -106,7 +101,6 @@ export class TimelineCanvas {
     controls.update();
   }
 
-
   /**
    * This method is called to update the canvas at each frame.
    */
@@ -115,7 +109,6 @@ export class TimelineCanvas {
     TimelineCanvas.renderer.render(TimelineCanvas.scene,
       TimelineCanvas.camera);
   }
-
 
   /**
    * Adds a directional light and hemisphere light to the scene.
