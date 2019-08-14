@@ -27,12 +27,14 @@ d3.csv('ellen_depth_test.csv').then(function (data: object) {
   const paintings = Array<timeline.Painting>();
 
   for (let i = 0; i < data.length; i++) {
-    const painting = {
-      year: data[i]['year'],
-      depth: data[i]['Depth'],
-      style: data[i]['art_movements']
-    };
-    paintings.push(painting);
+    const {asset_link, image, thumbnail, partner_name,
+      title, artist_name, year, location, art_movements, depth} = data[i];
+
+    paintings.push({
+      year: year,
+      depth: depth,
+      style: art_movements
+    });
   }
 
   new timelineCanvas.TimelineCanvas(paintings);

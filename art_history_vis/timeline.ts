@@ -67,7 +67,7 @@ export class Timeline {
    * @returns an object with an Array of Paintings for each year.
    */
   private getPaintingsByYear(paintings: Array<Painting>): object {
-    const paintingsByYear = [];
+    const paintingsByYear = {};
 
     for (let i = 0; i < paintings.length; i++) {
       const currYear = paintings[i].year;
@@ -92,24 +92,19 @@ export class Timeline {
     const offset = (GRAPH_END_YEAR - GRAPH_START_YEAR) / 2.0;
     const paintingsByYear = this.getPaintingsByYear(paintings);
 
-
-    for (let currPaintings of paintingsByYear) {
-      if (currPaintings != undefined) {
-        currPaintings.sort((a, b) => b.depth - a.depth);
-
-        for (let i = 0; i < currPaintings.length; i++) {
-          const currYear = currPaintings[i].year;
-          if (this.inGraphBounds(currYear)) {
-            const geometry = this.makePaintingGeometry(currPaintings[i], i, offset, currYear);
-            const material = new THREE.MeshLambertMaterial({
-              color: PAINTING_COLORS[i % PAINTING_COLORS.length],
-              opacity: PAINTING_OPACITY,
-              transparent: true
-            });
-
-            const cube = new THREE.Mesh(geometry, material);
-            this.paintingsGroup.add(cube);
-          }
+    for (let currPaintings of Object.values(paintingsByYear)) {
+      currPaintings.sort((a, b) => b.depth - a.depth);
+      for (let i = 0; i < currPaintings.length; i++) {
+        const currYear = currPaintings[i].year;
+        if (this.inGraphBounds(currYear)) {
+          const geometry = this.makePaintingGeometry(currPaintings[i], i, offset, currYear);
+          const material = new THREE.MeshLambertMaterial({
+            color: PAINTING_COLORS[i % PAINTING_COLORS.length],
+            opacity: PAINTING_OPACITY,
+            transparent: true
+          });
+          const cube = new THREE.Mesh(geometry, material);
+          this.paintingsGroup.add(cube);
         }
       }
     }
