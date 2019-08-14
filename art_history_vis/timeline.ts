@@ -61,20 +61,23 @@ export class Timeline {
   }
 
   /**
-   * Gets a list of paintings lists, with a list of paintings for each year.
+   * Gets an object containing an Array of paintings for every year
+   * (after year 0) that has at least one painting.
    * @param paintings an Array of Painting objects.
-   * @returns a list of list of Paintings.
+   * @returns an object with an Array of Paintings for each year.
    */
-  private getPaintingsByYear(paintings: Array<Painting>): Painting[][] {
+  private getPaintingsByYear(paintings: Array<Painting>): object {
     const paintingsByYear = [];
 
     for (let i = 0; i < paintings.length; i++) {
       const currYear = paintings[i].year;
-      if (!(currYear in paintingsByYear)) {
-        paintingsByYear[currYear] = [];
-      }
-      if (paintingsByYear[currYear].length < MAX_PAINTINGS_PER_YEAR) {
-        paintingsByYear[currYear].push(paintings[i]);
+      if (+currYear > 0) {
+        if (!(currYear in paintingsByYear)) {
+          paintingsByYear[currYear] = [];
+        }
+        if (paintingsByYear[currYear].length < MAX_PAINTINGS_PER_YEAR) {
+          paintingsByYear[currYear].push(paintings[i]);
+        }
       }
     }
 
@@ -89,22 +92,24 @@ export class Timeline {
     const offset = (GRAPH_END_YEAR - GRAPH_START_YEAR) / 2.0;
     const paintingsByYear = this.getPaintingsByYear(paintings);
 
-    for (let year in paintingsByYear) {
-      const curr_paintings = paintingsByYear[year];
-      curr_paintings.sort((a, b) => b.depth - a.depth);
 
-      for (let i = 0; i < curr_paintings.length; i++) {
-        const currYear = curr_paintings[i].year;
-        if (this.inGraphBounds(currYear)) {
-          const geometry = this.makePaintingGeometry(curr_paintings[i], i, offset, currYear);
-          const material = new THREE.MeshLambertMaterial({
-            color: PAINTING_COLORS[i % PAINTING_COLORS.length],
-            opacity: PAINTING_OPACITY,
-            transparent: true
-          });
+    for (let currPaintings of paintingsByYear) {
+      if (currPaintings != undefined) {
+        currPaintings.sort((a, b) => b.depth - a.depth);
 
-          const cube = new THREE.Mesh(geometry, material);
-          this.paintingsGroup.add(cube);
+        for (let i = 0; i < currPaintings.length; i++) {
+          const currYear = currPaintings[i].year;
+          if (this.inGraphBounds(currYear)) {
+            const geometry = this.makePaintingGeometry(currPaintings[i], i, offset, currYear);
+            const material = new THREE.MeshLambertMaterial({
+              color: PAINTING_COLORS[i % PAINTING_COLORS.length],
+              opacity: PAINTING_OPACITY,
+              transparent: true
+            });
+
+            const cube = new THREE.Mesh(geometry, material);
+            this.paintingsGroup.add(cube);
+          }
         }
       }
     }
@@ -159,7 +164,6 @@ export class Timeline {
    */
   public hide() {
     if (this.isHidden == false) {
-      console.log(this.paintingsGroup)
       this.scene.remove(this.paintingsGroup);
       this.isHidden = true;
     }
