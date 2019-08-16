@@ -14,4 +14,6 @@ adversarial/adversarial_example.py
 adversarial/layers.py
 adversarial/loss.py
 adversarial/nyu.h5
+art_history_vis/images/
+art_history_vis/temp/
 
