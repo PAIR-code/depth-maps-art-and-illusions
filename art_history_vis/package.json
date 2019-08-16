@@ -1,0 +1,34 @@
+{
+  "name": "final",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "engines": {
+    "node": ">=8.9.0"
+  },
+  "dependencies": {
+    "d3": "^5.9.7",
+    "examples": "^0.1.0",
+    "three": "^0.106.2",
+    "three-obj-mtl-loader": "^1.0.3",
+    "three-orbitcontrols-ts": "git+https://git@github.com/nicolaspanel/three-orbitcontrols-ts.git"
+  },
+  "devDependencies": {
+    "babel-plugin-transform-runtime": "~6.23.0",
+    "babel-polyfill": "~6.26.0",
+    "babel-preset-env": "~1.6.1",
+    "clang-format": "~1.2.2",
+    "cross-env": "~5.1.6",
+    "parcel-bundler": "^1.12.3",
+    "ts-node": "^8.3.0",
+    "typescript": "^3.0.3",
+    "yalc": "~1.0.0-pre.22"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "cross-env NODE_ENV=development parcel index.html --no-hmr --out-dir=./static",
+    "link-local": "yalc link"
+  },
+  "author": "",
+  "license": "ISC"
+}
