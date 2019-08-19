@@ -75,9 +75,7 @@ export class Timeline {
         if (!(currYear in paintingsByYear)) {
           paintingsByYear[currYear] = [];
         }
-        if (paintingsByYear[currYear].length < MAX_PAINTINGS_PER_YEAR) {
-          paintingsByYear[currYear].push(paintings[i]);
-        }
+        paintingsByYear[currYear].push(paintings[i]);
       }
     }
 
