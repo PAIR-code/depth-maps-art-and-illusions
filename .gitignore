@@ -14,4 +14,4 @@ adversarial/adversarial_example.py
 adversarial/layers.py
 adversarial/loss.py
 adversarial/nyu.h5
-final/*
+
