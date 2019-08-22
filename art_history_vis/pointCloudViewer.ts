@@ -34,7 +34,8 @@ const POINT_CLOUD_HEIGHT = 340;
 const POINT_CLOUD_ROTATE_Y = -0.6;
 
 /**
- * This class sets up the three.js scene and instantiates the timeline.
+ * This class extends Viewer, which creates a three.js scene. It sets up the
+ * point cloud three.js scene and loads the point cloud.
  */
 export class PointCloudViewer extends viewer.Viewer {
   pointCloudGroup: THREE.Group;
@@ -43,8 +44,9 @@ export class PointCloudViewer extends viewer.Viewer {
    * The constructor for the InfoViewer class.
    * @param paintings an Array of Painting objects.
    */
-  constructor(canvasid: string, width: number, height: number) {
-    super(canvasid, width, height);
+  constructor(canvas: HTMLCanvasElement, width: number, height: number,
+    enableRotate: boolean) {
+    super(canvas, width, height, enableRotate);
 
     this.pointCloudGroup = new THREE.Group();
     this.scene.add(this.pointCloudGroup)
@@ -52,16 +54,15 @@ export class PointCloudViewer extends viewer.Viewer {
     super.animate();
   }
 
-
   /**
    * Adds the depth image pixel points to the scene.
    */
-  public loadPointCloud(originalImageContext: CanvasRenderingContext2D,
+  public loadPointCloud(originalPaintingContext: CanvasRenderingContext2D,
     depthMapContext: CanvasRenderingContext2D) {
     // Clear any existing point cloud geometry.
     this.pointCloudGroup.children = [];
 
-    const pointsGeometry = this.updatePointsGeometry(originalImageContext,
+    const pointsGeometry = this.updatePointsGeometry(originalPaintingContext,
       depthMapContext);
     const pointsMaterial = new THREE.PointsMaterial({
       size: 5,
@@ -71,11 +72,13 @@ export class PointCloudViewer extends viewer.Viewer {
   }
 
   /**
-   *
-   * @param originalImageContext
-   * @param depthMapContext
+   * Updates the points in the point cloud given the new pixel information.
+   * @param originalPaintingContext a CanvasRenderingContext2D with the original
+   *    image's pixel information
+   * @param depthMapContext a CanvasRenderingContext2D with the depth map's
+   *    pixel information
    */
-  private updatePointsGeometry(originalImageContext: CanvasRenderingContext2D,
+  private updatePointsGeometry(originalPaintingContext: CanvasRenderingContext2D,
     depthMapContext: CanvasRenderingContext2D) {
 
     const positions = [];
@@ -85,33 +88,34 @@ export class PointCloudViewer extends viewer.Viewer {
     const heightStep = POINT_CLOUD_HEIGHT / NUM_POINTS;
     for (let i = 0; i < POINT_CLOUD_WIDTH; i += widthStep) {
       for (let j = 1; j < POINT_CLOUD_HEIGHT; j += heightStep) {
-        const pixelData = util.getPixelDataFromContext(depthMapContext,
+        const depthPixelData = util.getPixelDataFromContext(depthMapContext,
           i, j);
-        const coloredPixelData = util.getPixelDataFromContext(
-          originalImageContext, i, j);
+        const originalPixelData = util.getPixelDataFromContext(
+          originalPaintingContext, i, j);
 
-        // positions
+        // Add position data, with the depth value as the z position.
         const x_position = i;
         const y_position = POINT_CLOUD_HEIGHT - j;
-        const z_position = pixelData[0];
+        const z_position = depthPixelData[0];
         positions.push(
           x_position * X_SCALE + X_TRANSLATE,
           y_position * Y_SCALE + Y_TRANSLATE,
           z_position * Z_SCALE + Z_TRANSLATE
         );
 
-        // colors
+        // Use the color data from the original image
         colors.push(
-          coloredPixelData[0] / 255.0,
-          coloredPixelData[1] / 255.0,
-          coloredPixelData[2] / 255.0
+          originalPixelData[0] / 255.0,
+          originalPixelData[1] / 255.0,
+          originalPixelData[2] / 255.0
         );
       }
     }
-
     const pointsGeometry = new THREE.BufferGeometry();
-    pointsGeometry.addAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    pointsGeometry.addAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    pointsGeometry.addAttribute('position',
+      new THREE.Float32BufferAttribute(positions, 3));
+    pointsGeometry.addAttribute('color',
+      new THREE.Float32BufferAttribute(colors, 3));
     pointsGeometry.rotateY(POINT_CLOUD_ROTATE_Y);
 
     return pointsGeometry;

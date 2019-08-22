@@ -34,7 +34,7 @@ const HEM_GROUND_COLOR = 0x080820;
 
 
 /**
- * This class sets up the three.js scene and instantiates the timeline.
+ * This class sets up a three.js scene.
  */
 export class Viewer {
 
@@ -44,22 +44,27 @@ export class Viewer {
 
   /**
    * The constructor for the Viewer class.
-   * @param paintings an Array of Painting objects.
+   * @param canvas the HTMLCanvasElement for rendering the three.js scene
+   * @param width the width of the viewer.
+   * @param height the height of the viewer.
+   * @param enableRotate whether the viewer should allow rotation.
    */
-  constructor(canvasid: string, width: number, height: number) {
-    this.initializeCanvas(canvasid, width, height);
-    this.initializeOrbitControls();
+  constructor(canvas: HTMLCanvasElement, width: number, height: number,
+    enableRotate: boolean) {
+    this.initializeCanvas(canvas, width, height);
+    this.initializeOrbitControls(enableRotate);
     this.addLights();
   }
-
 
   /**
    * Initializes the main THREE.js components of the visualizer:
    * the renderer, camera, and scene.
+   * @param canvas the HTMLCanvasElement for rendering the three.js scene
+   * @param width the width of the viewer.
+   * @param height the height of the viewer.
    */
-  public initializeCanvas(canvasid: string, width: number, height: number) {
+  public initializeCanvas(canvas: HTMLCanvasElement, width: number, height: number) {
     // Initialize renderer.
-    const canvas = document.getElementById(canvasid);
     this.renderer = new THREE.WebGLRenderer({canvas});
     this.renderer.setSize(width, height);
 
@@ -78,10 +83,12 @@ export class Viewer {
 
   /**
    * Initializes orbit controls to control the scene's perspective camera.
+   * @param enableRotate whether the viewer should allow rotation.
    */
-  private initializeOrbitControls() {
+  private initializeOrbitControls(enableRotate: boolean) {
     let controls = new OrbitControls(this.camera,
       this.renderer.domElement);
+    controls.enableRotate = enableRotate;
     controls.zoomSpeed = 5;
     controls.keyPanSpeed = 200;
     controls.minZoom = -5;

@@ -19,12 +19,15 @@ import './index.css';
 import * as THREE from 'three';
 import {Painting} from './util';
 
+
 // Constants
-const UNIT_LENGTH = 0.4;
+const SCENE_UNIT_LENGTH = 0.4;
+
 const AXIS_COLOR = 0x999999;
 const AXIS_LENGTH = 10;
+
 const BLOCK_LENGTH = 2;
-const BLOCK_OPACITY = 0.5;
+const BLOCK_DEFAULT_OPACITY = 0.5;
 const BLOCK_SELECTED_OPACITY = 1.0;
 
 const GRAPH_START_YEAR = 1300;
@@ -32,27 +35,9 @@ const GRAPH_END_YEAR = 2020;
 const OFFSET = (GRAPH_END_YEAR - GRAPH_START_YEAR) / 2;
 const TICK_INTERVAL = 100;
 
-const STYLE_COLORS = [0x1dabe6, 0x1c366a, 0xc3ced0, 0xe43034, 0xfc4e51,
-  0xaf060f, 0x003f5c, 0x2f4b7c, 0x665191, 0xa05195, 0xd45087, 0xf95d6a,
-  0xff7c43, 0xffa600];
-
-const STYLE_NAMES = ['Modern art', 'Baroque', 'Renaissance', 'Romanticism',
-  'Realism', 'Dutch Golden Age', 'Impressionism', 'Post-Impressionism',
-  'Rococo', 'Contemporary art', 'Neoclassicism', 'Italian Renaissance',
-  'Academic art', 'Mannerism', 'Abstract art'];
-
-// , 'Symbolism', 'Modernism',
-// 'Street art', 'Ukiyo-e', 'Expressionism', 'American Impressionism',
-// 'Northern Renaissance', 'Antwerp school', 'Tonalism', 'Neo-impressionism',
-// 'Aestheticism', 'Cubism', 'Art Nouveau', 'Surrealism', 'Barbizon school',
-// 'American Realism', 'Hudson River School',
-// 'Dutch and Flemish Renaissance painting', 'Venetian school', 'Luminism',
-// 'High Renaissance', 'Classicism', 'Primitivism', 'Skagen Painters',
-// 'Hague School', 'Gothic art', 'Abstract expressionism',
-// 'German Renaissance', 'Ashcan School', 'Color Field'
 
 /**
- * This class holds the painting data and creates the depth plot geometry.
+ * This class creates the depth plot geometry and stores the painting data.
  */
 export class DepthPlot {
 
@@ -62,12 +47,13 @@ export class DepthPlot {
   blockToPainting: object;
 
   /**
-   * The constructor for the Viewer class.
+   * The constructor for the Viewer class makes the depth plot blocks and axes.
    * @param scene the three.js scene the timeline gets added to.
    * @param paintings an Array of Painting objects.
    */
   constructor(scene: THREE.Scene, paintings: Array<Painting>) {
     this.scene = scene;
+
     this.paintingsGroup = new THREE.Group();
     this.scene.add(this.paintingsGroup);
 
@@ -77,12 +63,47 @@ export class DepthPlot {
     this.makeAxes();
   }
 
+  /**
+   * Updates a given block Mesh's color and opacity (for changes in selection).
+   *
+   * @param block the THREE.Mesh block to update.
+   * @param color the THREE.Color to set as the material color property.
+   * @param selected a boolean that is true if the block should be set as selected
+   *  with full opacity, and false for default opacity.
+   */
   public updateBlock(block: THREE.Mesh, color: THREE.Color, selected: boolean) {
     block.material.color.copy(color);
     if (selected) {
       block.material.opacity = BLOCK_SELECTED_OPACITY;
     } else {
-      block.material.opacity = BLOCK_OPACITY;
+      block.material.opacity = BLOCK_DEFAULT_OPACITY;
+    }
+  }
+
+  /**
+   * Gets the color value for a given style.
+   * @param style the string with the name of the style.
+   */
+  private getStyleColor(style: string) {
+    [0x1dabe6, 0x1c366a, 0xc3ced0, 0xe43034, 0xfc4e51,
+      0xaf060f, 0x003f5c, 0x2f4b7c, 0x665191, 0xa05195, 0xd45087, 0xf95d6a,
+      0xff7c43, 0xffa600]
+    switch (style) {
+      case 'Baroque': {return 0x1c366a;}
+      case 'Renaissance': {return 0xc3ced0;}
+      case 'Romanticism': {return 0xe43034;}
+      case 'Realism': {return 0xfc4e51;}
+      case 'Dutch Golden Age': {return 0xaf060f;}
+      case 'Impressionism': {return 0x003f5c;}
+      case 'Post-Impressionism': {return 0x2f4b7c;}
+      case 'Rococo': {return 0x665191;}
+      case 'Contemporary art': {return 0xa05195;}
+      case 'Neoclassicism': {return 0xd45087;}
+      case 'Italian Renaissance': {return 0xf95d6a;}
+      case 'Academic art': {return 0xff7c43;}
+      case 'Mannerism': {return 0xffa600;}
+      case 'Abstract art': {return 0x1dabe6;}
+      default: {return null;}
     }
   }
 
@@ -92,25 +113,18 @@ export class DepthPlot {
    */
   private makeBlocks(paintings: Array<Painting>) {
     for (let i = 0; i < paintings.length; i++) {
-      const currYear = paintings[i].year;
-      const styles = paintings[i].style.split(', ');
-      if (this.inGraphBounds(currYear)) {
-        const geometryTip = this.makePlotGeometry(paintings[i], i, currYear);
-
-        let currColor = null;
-        for (let i = 0; i < STYLE_NAMES.length; i++) {
-          if (styles.includes(STYLE_NAMES[i])) {
-            currColor = STYLE_COLORS[i % STYLE_COLORS.length];
-          }
-        }
-
-        if (currColor != null) {
-          const materialTip = new THREE.MeshLambertMaterial({
-            color: currColor,
+      const year = paintings[i].year;
+      if (this.inGraphBounds(year)) {
+        const style = paintings[i].style.split(', ')[0];
+        const color = this.getStyleColor(style);
+        if (color != null) {
+          const geometry = this.makePlotGeometry(paintings[i], i, year);
+          const material = new THREE.MeshLambertMaterial({
+            color: color,
             transparent: true,
-            opacity: .5
+            opacity: BLOCK_DEFAULT_OPACITY
           });
-          const tip = new THREE.Mesh(geometryTip, materialTip);
+          const tip = new THREE.Mesh(geometry, material);
           this.blockToPainting[tip.uuid] = paintings[i];
           this.paintingsGroup.add(tip);
         }
@@ -119,40 +133,47 @@ export class DepthPlot {
   }
 
   /**
-   *
+   * Creates the X and Y axes.
    */
   private makeAxes() {
     this.makeXAxis();
     for (let i = GRAPH_START_YEAR; i < GRAPH_END_YEAR; i += TICK_INTERVAL) {
-      this.makeYTick(i);
+      this.makeXTick(i);
     }
   }
 
+  /**
+   * Creates the X axis.
+   */
   private makeXAxis() {
-    const width = UNIT_LENGTH * (GRAPH_END_YEAR - GRAPH_START_YEAR);
-    const height = UNIT_LENGTH;
-    const depth = UNIT_LENGTH;
+    const width = SCENE_UNIT_LENGTH * (GRAPH_END_YEAR - GRAPH_START_YEAR);
+    const height = SCENE_UNIT_LENGTH;
+    const depth = SCENE_UNIT_LENGTH;
     const geometry = new THREE.BoxBufferGeometry(width, height, depth);
 
     const material = new THREE.MeshLambertMaterial({
       color: AXIS_COLOR
     });
-    this.paintingsGroup.add(new THREE.Mesh(geometry, material));
+    this.scene.add(new THREE.Mesh(geometry, material));
   }
 
-  private makeYTick(year: number) {
-    const depth = UNIT_LENGTH;
-    const width = UNIT_LENGTH;
-    const height = UNIT_LENGTH * AXIS_LENGTH;
+  /**
+   * Makes a tick on the X axis at the given year.
+   * @param year the year where the tick should be drawn.
+   */
+  private makeXTick(year: number) {
+    const depth = SCENE_UNIT_LENGTH;
+    const width = SCENE_UNIT_LENGTH;
+    const height = SCENE_UNIT_LENGTH * AXIS_LENGTH;
     const geometry = new THREE.BoxBufferGeometry(width, height, depth);
 
-    const translateX = (year - GRAPH_START_YEAR - OFFSET) * UNIT_LENGTH;
+    const translateX = (year - GRAPH_START_YEAR - OFFSET) * SCENE_UNIT_LENGTH;
     geometry.translate(translateX, 0, 0);
 
     const material = new THREE.MeshLambertMaterial({
       color: AXIS_COLOR,
     });
-    this.paintingsGroup.add(new THREE.Mesh(geometry, material));
+    this.scene.add(new THREE.Mesh(geometry, material));
   }
 
   /**
@@ -174,16 +195,25 @@ export class DepthPlot {
    */
   private makePlotGeometry(painting: Painting, index: number,
     year: number): THREE.BoxBufferGeometry {
-    const width = UNIT_LENGTH * BLOCK_LENGTH;
-    const depth = UNIT_LENGTH * BLOCK_LENGTH;
-    const height = UNIT_LENGTH * BLOCK_LENGTH;
+    const width = SCENE_UNIT_LENGTH * BLOCK_LENGTH;
+    const depth = SCENE_UNIT_LENGTH * BLOCK_LENGTH;
+    const height = SCENE_UNIT_LENGTH * BLOCK_LENGTH;
     const geometry = new THREE.BoxBufferGeometry(width, height, depth);
 
-    const deltaX = (year - GRAPH_START_YEAR - OFFSET) * UNIT_LENGTH;
-    const deltaY = (depth / 2.0) + UNIT_LENGTH * painting.range;
+    const deltaX = (year - GRAPH_START_YEAR - OFFSET) * SCENE_UNIT_LENGTH;
+    const deltaY = (depth / 2.0) + SCENE_UNIT_LENGTH * painting.range;
     const deltaZ = 0;
     geometry.translate(deltaX, deltaY, deltaZ);
 
     return geometry;
+  }
+
+  /**
+   * Gets the Painting associated with the given Mesh ID.
+   * @param uuid a string that is the ID of the mesh.
+   * @returns the Painting associated to the Mesh ID.
+   */
+  public getPainting(uuid: string): Painting {
+    return this.blockToPainting[uuid];
   }
 }

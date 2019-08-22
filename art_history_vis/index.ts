@@ -27,8 +27,8 @@ let pointCloudViewer: PointCloudViewer;
  * Loads art history csv data and initializes the three.js scenes.
  */
 d3.csv('ellen_range_diff.csv').then((data: object) => {
+  // Loads csv data into Painting interface objects.
   const paintings = Array<Painting>();
-
   for (let i = 0; i < data.length; i++) {
     const link = data[i]['asset_link']
     const imageid = link.split("/").pop();
@@ -53,54 +53,41 @@ d3.csv('ellen_range_diff.csv').then((data: object) => {
       std_difference: std_difference
     });
   }
-  depthPlotViewer = new DepthPlotViewer(paintings, 'timeline-canvas',
-    window.innerWidth, window.innerHeight);
+
+  // Initializes three.js scenes for the depth plot and point cloud.
+  depthPlotViewer = new DepthPlotViewer(paintings,
+    document.getElementById('depth-plot-canvas') as HTMLCanvasElement,
+    window.innerWidth, window.innerHeight, false);
 
   const container = document.getElementById('point-cloud-container');
   pointCloudViewer = new PointCloudViewer(
-    'point-cloud-canvas', container.clientWidth, container.clientHeight);
+    document.getElementById('point-cloud-canvas') as HTMLCanvasElement,
+    container.clientWidth, container.clientHeight, true);
 });
 
-
-// Image loading
-const originalImage = document.getElementById('original-painting');
-originalImage.crossOrigin = "Anonymous";
-const depthMap = document.getElementById('depth-map');
-depthMap.crossOrigin = "Anonymous";
-
-
-function loadPointCloud() {
-  const depthMapContext = getImageContext(document.getElementById('depth-map'));
-  const originalImageContext = getImageContext(document.getElementById('original-painting'));
-  pointCloudViewer.loadPointCloud(originalImageContext, depthMapContext);
-}
-
-originalImage.onload = () => {
-  if (depthMap.complete) {
-    loadPointCloud();
-  }
-}
-
-depthMap.onload = () => {
-  if (originalImage.complete) {
-    loadPointCloud();
-  }
-}
-
-
-// Event listeners
+// Resize event listener
 window.addEventListener('resize', () => {
+  // Resize the depth plot's canvas to fit in the browser window.
   depthPlotViewer.resize(window.innerWidth, window.innerHeight);
+
+  // Resize the point cloud's canvas to fit in its DOM container.
   const container = document.getElementById('point-cloud-container');
   pointCloudViewer.resize(container.clientWidth, container.clientHeight);
 }, false);
 
 
-document.getElementById('timeline-canvas').addEventListener('click', () => {
-  const paintingData = depthPlotViewer.updateSelected();
-  if (paintingData != null) {
+// Depth plot click event listener
+document.getElementById('depth-plot-canvas').addEventListener('click', () => {
+  // Update any selection changes
+  depthPlotViewer.updateSelected();
+
+  // Get the Painting of the selected block
+  const paintingData = depthPlotViewer.getSelectedPainting();
+  if (paintingData) {
+    // Show the details panel
     document.getElementById('info-container').style.visibility = 'visible';
 
+    // Update displayed images
     document.getElementById('original-painting').src =
       "https://storage.googleapis.com/art_history_depth_data/GAC_images/"
       + paintingData.imageid + "/input.png";
@@ -108,6 +95,7 @@ document.getElementById('timeline-canvas').addEventListener('click', () => {
       "https://storage.googleapis.com/art_history_depth_data/GAC_unnorm/"
       + paintingData.imageid + "/output.png";
 
+    // Update painting details text
     document.getElementById('painting-title').innerHTML = '<a target="_blank" href=' + paintingData.asset_link + '>' + paintingData.title + '</a>';
     document.getElementById('year-text').innerHTML = '<b>Year:</b> ' + paintingData.year.toString();
     document.getElementById('style-text').innerHTML = '<b>Movement:</b> ' + paintingData.style;
@@ -115,6 +103,42 @@ document.getElementById('timeline-canvas').addEventListener('click', () => {
     document.getElementById('range-text').innerHTML = '<b>Depth Range:</b> ' + paintingData.range.toString();
     document.getElementById('partner-text').innerHTML = '<b>Source:</b> ' + paintingData.partner_name;
   } else {
+    // Hide the details panel if no painting was selected
     document.getElementById('info-container').style.visibility = 'hidden';
   }
 }, false);
+
+
+// Info panel image loading
+const originalImage = document.getElementById('original-painting');
+originalImage.crossOrigin = "Anonymous";
+const depthMap = document.getElementById('depth-map');
+depthMap.crossOrigin = "Anonymous";
+
+
+// The point cloud should load after both DOM images have finished loading.
+// If the other image's load is complete, the image will call loadPointCloud
+// once it is loaded.
+originalImage.onload = () => {
+  if (depthMap.complete) {
+    loadPointCloud();
+  }
+}
+depthMap.onload = () => {
+  if (originalImage.complete) {
+    loadPointCloud();
+  }
+}
+
+
+/**
+ * A helper function that loads the point cloud with the contexts containing
+ * pixel information of the depth map and original painting images.
+ */
+function loadPointCloud() {
+  const depthMapContext = getImageContext(
+    document.getElementById('depth-map'));
+  const originalPaintingContext = getImageContext(
+    document.getElementById('original-painting'));
+  pointCloudViewer.loadPointCloud(originalPaintingContext, depthMapContext);
+}

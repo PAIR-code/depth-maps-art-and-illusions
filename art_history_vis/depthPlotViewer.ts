@@ -21,21 +21,23 @@ import {Viewer} from './viewer';
 import {Painting} from './util';
 import {Color} from 'three';
 
+// Constants
 const SELECTED_COLOR = 0x000000;
 
+
+// Calculates mouse position in normalized device coordinates for RayCasting.
 const mouse = new THREE.Vector2();
 window.addEventListener('mousemove', (event: any) => {
-  // Calculates mouse position in normalized device coordinates.
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 }, false);
 
 
 /**
- * This class sets up the three.js scene and instantiates the depth plot.
+ * This class extends Viewer, which creates a three.js scene. It sets up the
+ * DepthPlot three.js scene.
  */
 export class DepthPlotViewer extends Viewer {
-
   depthPlot: DepthPlot;
   raycaster: THREE.Raycaster;
   currSelected: THREE.Mesh;
@@ -44,9 +46,14 @@ export class DepthPlotViewer extends Viewer {
   /**
    * The constructor for the DepthPlotViewer class.
    * @param paintings an Array of Painting objects.
+   * @param canvas the HTMLCanvasElement for rendering the three.js scene
+   * @param width the width of the viewer.
+   * @param height the height of the viewer.
+   * @param enableRotate whether the viewer should allow rotation.
    */
-  constructor(paintings: Array<Painting>, canvasid: string, width: number, height: number) {
-    super(canvasid, width, height);
+  constructor(paintings: Array<Painting>, canvas: HTMLCanvasElement,
+    width: number, height: number, enableRotate: boolean) {
+    super(canvas, width, height, enableRotate);
 
     this.depthPlot = new DepthPlot(this.scene,
       paintings);
@@ -67,30 +74,35 @@ export class DepthPlotViewer extends Viewer {
   }
 
   /**
-   * This method updates the selected painting.
+   * This method updates the selected painting's color and opacity.
    */
-  public updateSelected(): Painting {
+  public updateSelected() {
     if (this.currSelected != null) {
       this.depthPlot.updateBlock(this.currSelected, this.storedColor, false);
       this.currSelected = null;
     }
-
-    // update the picking ray with the camera and mouse position
+    // Update the picking ray with the camera and mouse position.
     this.raycaster.setFromCamera(mouse, this.camera);
-    // calculate objects intersecting the picking ray
+
+    // Calculate objects intersecting the picking ray.
     var intersects = this.raycaster.intersectObjects(this.scene.children, true);
 
     if (intersects.length > 0) {
       this.currSelected = intersects[0].object as THREE.Mesh;
-
+      // Store the selected block's color before updating its appearance.
       this.storedColor.copy(this.currSelected.material.color);
+
       this.depthPlot.updateBlock(this.currSelected,
         new THREE.Color(SELECTED_COLOR), true)
-
-      const uuid = this.currSelected.uuid;
-      const currPainting = this.depthPlot.blockToPainting[uuid] as Painting);
-      return currPainting;
     }
-    return null;
+  }
+
+  /**
+   * This method gets the painting object of the selected block.
+   *
+   * @return the selected Painting.
+   */
+  public getSelectedPainting(): Painting {
+    return this.depthPlot.getPainting(this.currSelected.uuid);
   }
 }
