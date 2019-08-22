@@ -16,126 +16,105 @@
  */
 
 import * as d3 from 'd3';
-import * as timelineCanvas from './timelineCanvas';
-import * as timeline from './timeline';
-import * as detailViewCanvas from './detailViewScene';
+import {DepthPlotViewer} from './depthPlotViewer';
+import {PointCloudViewer} from './pointCloudViewer';
+import {Painting, getImageContext} from './util';
 
-
-let timeCanvas: timelineCanvas.TimelineCanvas;
-let detailCanvas: detailViewCanvas.DetailViewCanvas;
+let depthPlotViewer: DepthPlotViewer;
+let pointCloudViewer: PointCloudViewer;
 
 /**
- * Loads art history csv data and initializes the timeline scene.
+ * Loads art history csv data and initializes the three.js scenes.
  */
-console.log('start loading');
-
-
-d3.csv('ellen_depth_test_full.csv').then(function (data: object) {
-  const paintings = Array<timeline.Painting>();
-
+d3.csv('ellen_range_diff.csv').then((data: object) => {
+  const paintings = Array<Painting>();
 
   for (let i = 0; i < data.length; i++) {
     const link = data[i]['asset_link']
     const imageid = link.split("/").pop();
-
     const {asset_link, image, thumbnail, partner_name,
-      title, artist_name, year, location, art_movements, depth} = data[i];
-
-    // paintings.push(painting);
+      title, artist_name, year, location, art_movements, Depth,
+      range, range_difference, std_difference} = data[i];
     paintings.push({
+      asset_link: asset_link,
+      image: image,
+      thumbnail: thumbnail,
+      partner_name: partner_name,
       year: year,
-      depth: depth,
+      depth: Depth,
       style: art_movements,
       imageid: imageid,
-      partner_name: partner_name,
       title: title,
       artist_name: artist_name,
       location: location,
-      art_movements: art_movements
+      art_movements: art_movements,
+      range: range,
+      range_difference: range_difference,
+      std_difference: std_difference
     });
   }
-  console.log(paintings);
-
-
-
-  detailCanvas = new detailViewCanvas.DetailViewCanvas('point-cloud-canvas');
-
-
-  const coloredImg = document.getElementById('my-colored-image');
-  coloredImg.crossOrigin = "Anonymous";
-  const dv = this;
-  coloredImg.onload = function () {
-    detailViewCanvas.DetailViewCanvas.detailView.initializePointCloud();
-  }
-
-
-  const img = document.getElementById('my-image');
-  img.crossOrigin = "Anonymous";
-
-
-  timeCanvas = new timelineCanvas.TimelineCanvas(paintings, 'timeline-canvas',
-    "timeline");
-
-
-
-  window.addEventListener('resize', onWindowResize, false);
-
-});
-
-function onWindowResize() {
-  const timelineCamera = timeCanvas.getCamera();
-  timelineCamera.aspect = window.innerWidth / window.innerHeight;
-  timelineCamera.updateProjectionMatrix();
-  timeCanvas.getRenderer().setSize(window.innerWidth, window.innerHeight);
+  depthPlotViewer = new DepthPlotViewer(paintings, 'timeline-canvas',
+    window.innerWidth, window.innerHeight);
 
   const container = document.getElementById('point-cloud-container');
-  const detailViewCamera = detailCanvas.getCamera();
-  detailViewCamera.aspect = container.clientWidth / container.clientHeight;
-  detailViewCamera.updateProjectionMatrix();
-  detailCanvas.getRenderer().setSize(container.clientWidth, container.clientHeight);
+  pointCloudViewer = new PointCloudViewer(
+    'point-cloud-canvas', container.clientWidth, container.clientHeight);
+});
+
+
+// Image loading
+const originalImage = document.getElementById('original-painting');
+originalImage.crossOrigin = "Anonymous";
+const depthMap = document.getElementById('depth-map');
+depthMap.crossOrigin = "Anonymous";
+
+
+function loadPointCloud() {
+  const depthMapContext = getImageContext(document.getElementById('depth-map'));
+  const originalImageContext = getImageContext(document.getElementById('original-painting'));
+  pointCloudViewer.loadPointCloud(originalImageContext, depthMapContext);
+}
+
+originalImage.onload = () => {
+  if (depthMap.complete) {
+    loadPointCloud();
+  }
+}
+
+depthMap.onload = () => {
+  if (originalImage.complete) {
+    loadPointCloud();
+  }
 }
 
 
+// Event listeners
+window.addEventListener('resize', () => {
+  depthPlotViewer.resize(window.innerWidth, window.innerHeight);
+  const container = document.getElementById('point-cloud-container');
+  pointCloudViewer.resize(container.clientWidth, container.clientHeight);
+}, false);
 
-function onClick(event: any) {
-  const paintingData = timeCanvas.updateSelected();
 
+document.getElementById('timeline-canvas').addEventListener('click', () => {
+  const paintingData = depthPlotViewer.updateSelected();
   if (paintingData != null) {
-    setDetailViewSrc(paintingData.imageid);
+    document.getElementById('info-container').style.visibility = 'visible';
 
-    document.getElementById('painting-title').innerHTML = paintingData.title;
-    document.getElementById('year-text').innerHTML = paintingData.year.toString();
-    document.getElementById('style-text').innerHTML = paintingData.style;
-    document.getElementById('depth-text').innerHTML = paintingData.depth.toString();
+    document.getElementById('original-painting').src =
+      "https://storage.googleapis.com/art_history_depth_data/GAC_images/"
+      + paintingData.imageid + "/input.png";
+    document.getElementById('depth-map').src =
+      "https://storage.googleapis.com/art_history_depth_data/GAC_unnorm/"
+      + paintingData.imageid + "/output.png";
 
+    document.getElementById('painting-title').innerHTML = '<a target="_blank" href=' + paintingData.asset_link + '>' + paintingData.title + '</a>';
+    document.getElementById('year-text').innerHTML = '<b>Year:</b> ' + paintingData.year.toString();
+    document.getElementById('style-text').innerHTML = '<b>Movement:</b> ' + paintingData.style;
+    document.getElementById('artist-text').innerHTML = '<b>Artist:</b> ' + paintingData.artist_name;
+    document.getElementById('range-text').innerHTML = '<b>Depth Range:</b> ' + paintingData.range.toString();
+    document.getElementById('partner-text').innerHTML = '<b>Source:</b> ' + paintingData.partner_name;
+  } else {
+    document.getElementById('info-container').style.visibility = 'hidden';
   }
-}
-
-function setDetailViewSrc(imageid: string) {
-  const originalPainting = document.getElementById('original-painting');
-  originalPainting.src = "https://storage.googleapis.com/art_history_depth_data/GAC_images/"
-    + imageid + "/input.png";
-
-
-  const depthMap = document.getElementById('depth-map');
-  depthMap.src = "https://storage.googleapis.com/art_history_depth_data/GAC_images/"
-    + imageid + "/output.png";
-
-
-  document.getElementById('my-colored-image').src = originalPainting.src;
-  document.getElementById('my-image').src = depthMap.src;
-}
-
-window.addEventListener('click', onClick, false);
-
-document.getElementById('id-input').addEventListener('keypress', (e: KeyboardEvent) => {
-  if (e.keyCode === 13) {
-    console.log(document.getElementById('id-input').value);
-    const imageid = document.getElementById('id-input').value;
-    setDetailViewSrc(imageid);
-  }
-};
-
-
-
-
+}, false);

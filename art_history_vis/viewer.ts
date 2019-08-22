@@ -16,17 +16,15 @@
  */
 
 import * as THREE from 'three';
-import * as timeline from './timeline';
 import {OrbitControls} from 'three-orbitcontrols-ts';
-import * as detailView from './detailView';
 
 // Constants
-const BACKGROUND_COLOR = 0xeeeeee;
+const BACKGROUND_COLOR = 0xffffff;
 const CAMERA_FOV = 27;
 const CAMERA_NEAR = 5;
 const CAMERA_FAR = 3500;
-const CAMERA_POS_Y = 0.3;
-const CAMERA_POS_Z = 100;
+const CAMERA_POS_Y = 0;
+const CAMERA_POS_Z = 350;
 const CAMERA_FOCAL_LENGTH = 60;
 const DIR_LIGHT_INTENSITY = 0.5;
 const DIR_LIGHT_TARGET_Z = -10;
@@ -38,82 +36,52 @@ const HEM_GROUND_COLOR = 0x080820;
 /**
  * This class sets up the three.js scene and instantiates the timeline.
  */
-export class DetailViewCanvas {
+export class Viewer {
 
-  static renderer: THREE.WebGLRenderer;
-  static camera: THREE.PerspectiveCamera;
-  static scene: THREE.Scene;
-  static detailView: detailView.DetailView;
-
+  renderer: THREE.WebGLRenderer;
+  camera: THREE.PerspectiveCamera;
+  public scene: THREE.Scene;
 
   /**
-   * The constructor for the DetailViewCanvas class.
+   * The constructor for the Viewer class.
    * @param paintings an Array of Painting objects.
    */
-  constructor(canvasid: string) {
-    this.initializeCanvas(canvasid);
+  constructor(canvasid: string, width: number, height: number) {
+    this.initializeCanvas(canvasid, width, height);
     this.initializeOrbitControls();
     this.addLights();
-
-    this.initializeDetailView();
-
-
-
-    DetailViewCanvas.animate();
   }
 
-  public initializeDetailView() {
-    DetailViewCanvas.detailView = new detailView.DetailView(DetailViewCanvas.scene);
-    DetailViewCanvas.detailView.show();
-  }
-
-  public getCamera(): THREE.PerspectiveCamera {
-    return DetailViewCanvas.camera;
-  }
-
-  public getRenderer(): THREE.WebGLRenderer {
-    return DetailViewCanvas.renderer;
-  }
 
   /**
    * Initializes the main THREE.js components of the visualizer:
    * the renderer, camera, and scene.
    */
-  public initializeCanvas(canvasid: string) {
+  public initializeCanvas(canvasid: string, width: number, height: number) {
     // Initialize renderer.
     const canvas = document.getElementById(canvasid);
-    const container = document.getElementById('point-cloud-container');
-    DetailViewCanvas.renderer = new THREE.WebGLRenderer({canvas});
-    // DetailViewCanvas.renderer.setPixelRatio(window.devicePixelRatio);
-    // console.log(container);
-    DetailViewCanvas.renderer.setSize(container.clientWidth,
-      container.clientHeight);
+    this.renderer = new THREE.WebGLRenderer({canvas});
+    this.renderer.setSize(width, height);
 
     // Initialize camera.
-    DetailViewCanvas.camera = new THREE.PerspectiveCamera(
-      CAMERA_FOV, container.clientWidth / container.clientHeight,
+    this.camera = new THREE.PerspectiveCamera(
+      CAMERA_FOV, width / height,
       CAMERA_NEAR, CAMERA_FAR);
-    DetailViewCanvas.camera.position.y = CAMERA_POS_Y;
-    DetailViewCanvas.camera.position.z = CAMERA_POS_Z;
-    DetailViewCanvas.camera.setFocalLength(CAMERA_FOCAL_LENGTH);
+    this.camera.position.y = CAMERA_POS_Y;
+    this.camera.position.z = CAMERA_POS_Z;
+    this.camera.setFocalLength(CAMERA_FOCAL_LENGTH);
 
     // Initialize scene.
-    DetailViewCanvas.scene = new THREE.Scene();
-    DetailViewCanvas.scene.background = new THREE.Color(BACKGROUND_COLOR);
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(BACKGROUND_COLOR);
   }
 
   /**
    * Initializes orbit controls to control the scene's perspective camera.
    */
   private initializeOrbitControls() {
-    let controls = new OrbitControls(DetailViewCanvas.camera,
-      DetailViewCanvas.renderer.domElement);
-    controls.keys = {
-      LEFT: 37, //left arrow
-      UP: 38, // up arrow
-      RIGHT: 39, // right arrow
-      BOTTOM: 40 // down arrow
-    }
+    let controls = new OrbitControls(this.camera,
+      this.renderer.domElement);
     controls.zoomSpeed = 5;
     controls.keyPanSpeed = 200;
     controls.minZoom = -5;
@@ -123,13 +91,17 @@ export class DetailViewCanvas {
   /**
    * This method is called to update the canvas at each frame.
    */
-  public static animate() {
-    requestAnimationFrame(DetailViewCanvas.animate);
+  public animate() {
+    requestAnimationFrame(() => {this.animate();});
     // update the picking ray with the camera and mouse position
+    this.renderer.render(this.scene,
+      this.camera);
+  }
 
-
-    DetailViewCanvas.renderer.render(DetailViewCanvas.scene,
-      DetailViewCanvas.camera);
+  public resize(width: number, height: number) {
+    this.camera.aspect = width / height;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(width, height);
   }
 
   /**
@@ -138,16 +110,16 @@ export class DetailViewCanvas {
   private addLights() {
     const directionalLight = new THREE.DirectionalLight(DIR_LIGHT_COLOR,
       DIR_LIGHT_INTENSITY);
-    DetailViewCanvas.scene.add(directionalLight);
+    this.scene.add(directionalLight);
 
     // The target object controls the orientation of the DirectionalLight.
     const targetObject = new THREE.Object3D();
     targetObject.translateZ(DIR_LIGHT_TARGET_Z);
-    DetailViewCanvas.scene.add(targetObject);
+    this.scene.add(targetObject);
     directionalLight.target = targetObject;
 
     const hemisphereLight = new THREE.HemisphereLight(HEM_SKY_COLOR,
       HEM_GROUND_COLOR, 1);
-    DetailViewCanvas.scene.add(hemisphereLight);
+    this.scene.add(hemisphereLight);
   }
 }

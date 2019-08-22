@@ -12,6 +12,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License. */
 
+h4 {
+  margin-top: 0px;
+  font-family: 'sans serif';
+  text-transform: uppercase;
+
+}
+
 body {
   margin: 0px;
 }
@@ -24,62 +31,75 @@ button {
   top: 50%;
 }
 
-h4 {
-  margin-top: 0px;
+a {
+  color: black;
 }
 
-.detail-view-container {
+#info-container {
   position: absolute;
   display: block;
+  visibility: hidden;
   bottom: 8%;
   width: 100%;
-  height: 450px;
+  height: 500px;
+  padding-top: 25px;
+  padding-bottom: 25px;
 }
 
-.details-container {
+#info-background {
+  background: #6699CC;
+  opacity: 0.2;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  position: absolute;
+}
+
+#details-container {
   position: absolute;
   width: 250px;
   height: 100%;
   right: 65px;
 }
 
-.point-cloud-container {
+#gac-logo {
+  position: absolute;
+  bottom: 40px;
+  left: 10px;
+}
+
+#point-cloud-container {
   position: absolute;
   left: 375px;
   right: 375px;
-  height: 100%;
+  height: 500px;
   text-align: center;
 }
 
-.point-cloud-canvas {
+#point-cloud-canvas {
   display: inline-block;
 }
 
-.image-container {
+#image-container {
   position: absolute;
   left: 100px;
   width: 250px;
   height: 100%;
 }
 
-.input-image {
+#input-image {
   position: absolute;
   width: 225px;
   height: 170px;
   text-align: center;
 }
 
-.output-image {
+#output-image {
   position: absolute;
   width: 225px;
   height: 170px;
   top: 250px;
   text-align: center;
-}
-
-.cat-image {
-  width: 500px;
-  height: 500px;
 }
 
 .image {
@@ -95,5 +115,7 @@ h4 {
 }
 
 .art-text-details {
-  font-size: 15px;
+  font-size: 14px;
+  font-family: 'sans serif';
+  margin-bottom: 8px;
 }

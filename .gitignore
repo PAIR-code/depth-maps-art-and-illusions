@@ -16,4 +16,6 @@ adversarial/loss.py
 adversarial/nyu.h5
 art_history_vis/images/
 art_history_vis/temp/
+static/
+util.py
 
