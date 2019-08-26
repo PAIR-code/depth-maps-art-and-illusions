@@ -17,6 +17,42 @@ limitations under the License. -->
 <title>Depth in Art History</title>
 
 <body>
-  <canvas id="canvas-container"></canvas>
+  <canvas id="depth-plot-canvas"></canvas>
+  <div id="info-container">
+    <div id="info-background"></div>
+    <div id="details-container">
+      <h4 id="painting-title"
+          class="art-text"></h4>
+      <div id="artist-text"
+           class="art-text art-text-details"></div>
+      <div id="year-text"
+           class="art-text art-text-details"></div>
+      <div id="style-text"
+           class="art-text art-text-details"></div>
+      <div id="partner-text"
+           class="art-text art-text-details"></div>
+      <div id="range-text"
+           class="art-text art-text-details"></div>
+    </div>
+    <div id="point-cloud-container">
+      <canvas id="point-cloud-canvas"></canvas>
+    </div>
+    <div id="image-container">
+      <div id="input-image">
+        <div class="art-text-details">
+          Original Painting
+        </div>
+        <img class="image"
+             id="original-painting">
+      </div>
+      <div id="output-image">
+        <div class="art-text-details">
+          Depth Map
+        </div>
+        <img class="image"
+             id="depth-map">
+      </div>
+    </div>
+  </div>
 </body>
 <script src="./index.ts"></script>
