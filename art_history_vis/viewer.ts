@@ -31,6 +31,9 @@ const DIR_LIGHT_TARGET_Z = -10;
 const DIR_LIGHT_COLOR = 0xffffff;
 const HEM_SKY_COLOR = 0xffffbb;
 const HEM_GROUND_COLOR = 0x080820;
+const CONTROLS_ZOOM_SPEED = 2;
+const CONTROLS_PAN_SPEED = 200;
+const CONTROLS_MIN_ZOOM = -5;
 
 
 /**
@@ -41,6 +44,7 @@ export class Viewer {
   renderer: THREE.WebGLRenderer;
   camera: THREE.PerspectiveCamera;
   public scene: THREE.Scene;
+  controls: OrbitControls;
 
   /**
    * The constructor for the Viewer class.
@@ -82,17 +86,42 @@ export class Viewer {
   }
 
   /**
+   *
+   * @param positionX
+   * @param positionY
+   * @param positionZ
+   * @param focalLength
+   */
+  public setCamera(positionX: number, positionY: number, positionZ: number,
+    focalLength: number) {
+    this.camera.position.x = positionX;
+    this.camera.position.y = positionY;
+    this.camera.position.z = positionZ;
+    this.camera.setFocalLength(focalLength);
+  }
+
+  /**
    * Initializes orbit controls to control the scene's perspective camera.
    * @param enableRotate whether the viewer should allow rotation.
    */
   private initializeOrbitControls(enableRotate: boolean) {
-    let controls = new OrbitControls(this.camera,
+    this.controls = new OrbitControls(this.camera,
       this.renderer.domElement);
-    controls.enableRotate = enableRotate;
-    controls.zoomSpeed = 5;
-    controls.keyPanSpeed = 200;
-    controls.minZoom = -5;
-    controls.update();
+    this.controls.enableRotate = enableRotate;
+    if (enableRotate) {
+      this.controls.rotateSpeed = .5;
+      //todo: change
+      document.getElementById('reset-button').addEventListener('click', () => {this.controls.reset();});
+    }
+    this.controls.zoomSpeed = CONTROLS_ZOOM_SPEED;
+    this.controls.keyPanSpeed = CONTROLS_PAN_SPEED;
+    this.controls.minZoom = CONTROLS_MIN_ZOOM;
+    this.controls.mouseButtons = {
+      ORBIT: THREE.MOUSE.RIGHT,
+      ZOOM: THREE.MOUSE.MIDDLE,
+      PAN: THREE.MOUSE.LEFT
+    };
+    this.controls.update();
   }
 
   /**
@@ -105,6 +134,11 @@ export class Viewer {
       this.camera);
   }
 
+  /**
+   * Resizes the viewer, updating the camera and renderer settings.
+   * @param width the new resized width of the viewer.
+   * @param height the new resized height of the viewer.
+   */
   public resize(width: number, height: number) {
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();

@@ -22,14 +22,16 @@ import {Painting} from './util';
 import {Color} from 'three';
 
 // Constants
-const SELECTED_COLOR = 0x000000;
+const SELECTED_COLOR = 0xFF1493;
 
 
 // Calculates mouse position in normalized device coordinates for RayCasting.
 const mouse = new THREE.Vector2();
 window.addEventListener('mousemove', (event: any) => {
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+  const depthContainer = document.getElementById('outer-container');
+  mouse.x = (event.clientX / depthContainer.clientWidth) * 2 - 1;
+  mouse.y = - ((event.clientY - 425) /
+    depthContainer.clientHeight) * 2 + 1;
 }, false);
 
 
@@ -38,10 +40,10 @@ window.addEventListener('mousemove', (event: any) => {
  * DepthPlot three.js scene.
  */
 export class DepthPlotViewer extends Viewer {
-  depthPlot: DepthPlot;
-  raycaster: THREE.Raycaster;
-  currSelected: THREE.Mesh;
-  storedColor: Color;
+  public depthPlot: DepthPlot;
+  private raycaster: THREE.Raycaster = new THREE.Raycaster();
+  private currSelected: THREE.Mesh = null;
+  private storedColor: Color = new THREE.Color();
 
   /**
    * The constructor for the DepthPlotViewer class.
@@ -54,22 +56,18 @@ export class DepthPlotViewer extends Viewer {
   constructor(paintings: Array<Painting>, canvas: HTMLCanvasElement,
     width: number, height: number, enableRotate: boolean) {
     super(canvas, width, height, enableRotate);
-
     this.depthPlot = new DepthPlot(this.scene,
       paintings);
-    this.currSelected = null;
-    this.storedColor = new THREE.Color();
-    this.raycaster = new THREE.Raycaster();
 
     this.animate();
   }
+
 
   /**
    * This method is called to update the canvas at each frame.
    */
   public animate() {
     requestAnimationFrame(() => this.animate());
-
     this.renderer.render(this.scene, this.camera);
   }
 
@@ -88,12 +86,15 @@ export class DepthPlotViewer extends Viewer {
     var intersects = this.raycaster.intersectObjects(this.scene.children, true);
 
     if (intersects.length > 0) {
-      this.currSelected = intersects[0].object as THREE.Mesh;
-      // Store the selected block's color before updating its appearance.
-      this.storedColor.copy(this.currSelected.material.color);
+      const intersection = intersects[0].object as THREE.Mesh;
+      if (intersection.uuid in this.depthPlot.blockToPainting) {
+        // Store the selected block's color before updating its appearance.
+        this.currSelected = intersection;
+        this.storedColor.copy(this.currSelected.material.color);
 
-      this.depthPlot.updateBlock(this.currSelected,
-        new THREE.Color(SELECTED_COLOR), true)
+        this.depthPlot.updateBlock(this.currSelected,
+          new THREE.Color(SELECTED_COLOR), true);
+      }
     }
   }
 
@@ -103,6 +104,9 @@ export class DepthPlotViewer extends Viewer {
    * @return the selected Painting.
    */
   public getSelectedPainting(): Painting {
-    return this.depthPlot.getPainting(this.currSelected.uuid);
+    if (this.currSelected != null) {
+      return this.depthPlot.getPainting(this.currSelected.uuid);
+    }
+    return null;
   }
 }
