@@ -38,7 +38,7 @@ const POINT_CLOUD_ROTATE_Y = -0.6;
  * point cloud three.js scene and loads the point cloud.
  */
 export class PointCloudViewer extends viewer.Viewer {
-  pointCloudGroup: THREE.Group;
+  pointCloudGroup: THREE.Group = new THREE.Group();
 
   /**
    * The constructor for the InfoViewer class.
@@ -47,8 +47,6 @@ export class PointCloudViewer extends viewer.Viewer {
   constructor(canvas: HTMLCanvasElement, width: number, height: number,
     enableRotate: boolean) {
     super(canvas, width, height, enableRotate);
-
-    this.pointCloudGroup = new THREE.Group();
     this.scene.add(this.pointCloudGroup)
 
     super.animate();

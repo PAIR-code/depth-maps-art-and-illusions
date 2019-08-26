@@ -31,6 +31,9 @@ const DIR_LIGHT_TARGET_Z = -10;
 const DIR_LIGHT_COLOR = 0xffffff;
 const HEM_SKY_COLOR = 0xffffbb;
 const HEM_GROUND_COLOR = 0x080820;
+const CONTROLS_ZOOM_SPEED = 5;
+const CONTROLS_PAN_SPEED = 200;
+const CONTROLS_MIN_ZOOM = -5;
 
 
 /**
@@ -89,9 +92,9 @@ export class Viewer {
     let controls = new OrbitControls(this.camera,
       this.renderer.domElement);
     controls.enableRotate = enableRotate;
-    controls.zoomSpeed = 5;
-    controls.keyPanSpeed = 200;
-    controls.minZoom = -5;
+    controls.zoomSpeed = CONTROLS_ZOOM_SPEED;
+    controls.keyPanSpeed = CONTROLS_PAN_SPEED;
+    controls.minZoom = CONTROLS_MIN_ZOOM;
     controls.update();
   }
 
@@ -105,6 +108,11 @@ export class Viewer {
       this.camera);
   }
 
+  /**
+   * Resizes the viewer, updating the camera and renderer settings.
+   * @param width the new resized width of the viewer.
+   * @param height the new resized height of the viewer.
+   */
   public resize(width: number, height: number) {
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();

@@ -35,16 +35,32 @@ const GRAPH_END_YEAR = 2020;
 const OFFSET = (GRAPH_END_YEAR - GRAPH_START_YEAR) / 2;
 const TICK_INTERVAL = 100;
 
+const ART_STYLE_COLOR_MAP = {
+  'Baroque': 0x1c366a,
+  'Renaissance': 0xc3ced0,
+  'Romanticism': 0xe43034,
+  'Realism': 0xfc4e51,
+  'Dutch Golden Age': 0xaf060f,
+  'Impressionism': 0x003f5c,
+  'Post-Impressionism': 0x2f4b7c,
+  'Rococo': 0x665191,
+  'Contemporary art': 0xa05195,
+  'Neoclassicism': 0xd45087,
+  'Italian Renaissance': 0xf95d6a,
+  'Academic art': 0xff7c43,
+  'Mannerism': 0xffa600,
+  'Abstract art': 0x1dabe6
+}
+
 
 /**
  * This class creates the depth plot geometry and stores the painting data.
  */
 export class DepthPlot {
 
-  scene: THREE.Scene;
-  paintingsGroup: THREE.Group;
-  paintingsData: Array<Painting>;
-  blockToPainting: object;
+  private scene: THREE.Scene;
+  private paintingsGroup: THREE.Group = new THREE.Group();
+  private blockToPainting: {[id: string]: Painting} = {};
 
   /**
    * The constructor for the Viewer class makes the depth plot blocks and axes.
@@ -53,11 +69,7 @@ export class DepthPlot {
    */
   constructor(scene: THREE.Scene, paintings: Array<Painting>) {
     this.scene = scene;
-
-    this.paintingsGroup = new THREE.Group();
     this.scene.add(this.paintingsGroup);
-
-    this.blockToPainting = {};
 
     this.makeBlocks(paintings);
     this.makeAxes();
@@ -85,26 +97,10 @@ export class DepthPlot {
    * @param style the string with the name of the style.
    */
   private getStyleColor(style: string) {
-    [0x1dabe6, 0x1c366a, 0xc3ced0, 0xe43034, 0xfc4e51,
-      0xaf060f, 0x003f5c, 0x2f4b7c, 0x665191, 0xa05195, 0xd45087, 0xf95d6a,
-      0xff7c43, 0xffa600]
-    switch (style) {
-      case 'Baroque': {return 0x1c366a;}
-      case 'Renaissance': {return 0xc3ced0;}
-      case 'Romanticism': {return 0xe43034;}
-      case 'Realism': {return 0xfc4e51;}
-      case 'Dutch Golden Age': {return 0xaf060f;}
-      case 'Impressionism': {return 0x003f5c;}
-      case 'Post-Impressionism': {return 0x2f4b7c;}
-      case 'Rococo': {return 0x665191;}
-      case 'Contemporary art': {return 0xa05195;}
-      case 'Neoclassicism': {return 0xd45087;}
-      case 'Italian Renaissance': {return 0xf95d6a;}
-      case 'Academic art': {return 0xff7c43;}
-      case 'Mannerism': {return 0xffa600;}
-      case 'Abstract art': {return 0x1dabe6;}
-      default: {return null;}
+    if (style in ART_STYLE_COLOR_MAP) {
+      return ART_STYLE_COLOR_MAP[style];
     }
+    return null;
   }
 
   /**
@@ -133,7 +129,7 @@ export class DepthPlot {
   }
 
   /**
-   * Creates the X and Y axes.
+   * Creates the X axis.
    */
   private makeAxes() {
     this.makeXAxis();
@@ -189,7 +185,6 @@ export class DepthPlot {
    * Makes the BoxBufferGeometry for the given painting.
    * @param painting a Painting object to be represented by the mesh.
    * @param index a number that is the index of this painting in its 'year' list.
-   * @param offset a number that is the 'x' offset of the timeline geometry.
    * @param year a number that is the year of the painting object.
    * @returns the BoxBufferGeometry of the Painting.
    */

@@ -38,10 +38,10 @@ window.addEventListener('mousemove', (event: any) => {
  * DepthPlot three.js scene.
  */
 export class DepthPlotViewer extends Viewer {
-  depthPlot: DepthPlot;
-  raycaster: THREE.Raycaster;
-  currSelected: THREE.Mesh;
-  storedColor: Color;
+  public depthPlot: DepthPlot;
+  private raycaster: THREE.Raycaster = new THREE.Raycaster();
+  private currSelected: THREE.Mesh = null;
+  private storedColor: Color = new THREE.Color();
 
   /**
    * The constructor for the DepthPlotViewer class.
@@ -54,12 +54,8 @@ export class DepthPlotViewer extends Viewer {
   constructor(paintings: Array<Painting>, canvas: HTMLCanvasElement,
     width: number, height: number, enableRotate: boolean) {
     super(canvas, width, height, enableRotate);
-
     this.depthPlot = new DepthPlot(this.scene,
       paintings);
-    this.currSelected = null;
-    this.storedColor = new THREE.Color();
-    this.raycaster = new THREE.Raycaster();
 
     this.animate();
   }
@@ -85,7 +81,7 @@ export class DepthPlotViewer extends Viewer {
     this.raycaster.setFromCamera(mouse, this.camera);
 
     // Calculate objects intersecting the picking ray.
-    var intersects = this.raycaster.intersectObjects(this.scene.children, true);
+    const intersects = this.raycaster.intersectObjects(this.scene.children, true);
 
     if (intersects.length > 0) {
       this.currSelected = intersects[0].object as THREE.Mesh;
