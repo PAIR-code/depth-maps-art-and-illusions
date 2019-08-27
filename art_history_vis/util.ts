@@ -82,12 +82,30 @@ export function getPixelDataFromContext(context: CanvasRenderingContext2D,
 }
 
 /**
-   * Gets the color value for a given style.
-   * @param style the string with the name of the style.
-   */
+ * Gets the color value for a given style.
+ * @param style the string with the name of the style.
+ */
 export function getStyleColor(style: string) {
   if (style in ART_STYLE_COLOR_MAP) {
     return ART_STYLE_COLOR_MAP[style];
   }
   return null;
+}
+
+/**
+ * Delays the execution of a given function by a number of milliseconds.
+ * @param delayTime the amount of time to delay by(in millisec.)
+ * @param delayedFunction the function to debounce.
+ */
+export function debounced(delayTime: number, delayedFunction: Function) {
+  let timerOutput: number;
+  return (...args: object[]) => {
+    if (timerOutput) {
+      clearTimeout(timerOutput);
+    }
+    timerOutput = setTimeout(() => {
+      delayedFunction(...args);
+      timerOutput = null;
+    }, delayTime);
+  }
 }

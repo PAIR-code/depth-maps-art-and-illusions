@@ -83,7 +83,7 @@ export class DepthPlotViewer extends Viewer {
     this.raycaster.setFromCamera(mouse, this.camera);
 
     // Calculate objects intersecting the picking ray.
-    var intersects = this.raycaster.intersectObjects(this.scene.children, true);
+    const intersects = this.raycaster.intersectObjects(this.scene.children, true);
 
     if (intersects.length > 0) {
       const intersection = intersects[0].object as THREE.Mesh;

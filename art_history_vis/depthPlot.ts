@@ -39,6 +39,23 @@ const GRAPH_END_YEAR = 2019;
 const OFFSET = (GRAPH_END_YEAR - GRAPH_START_YEAR) / 2;
 const TICK_INTERVAL = 100;
 
+const ART_STYLE_COLOR_MAP = {
+  'Baroque': 0x1c366a,
+  'Renaissance': 0xc3ced0,
+  'Romanticism': 0xe43034,
+  'Realism': 0xfc4e51,
+  'Dutch Golden Age': 0xaf060f,
+  'Impressionism': 0x003f5c,
+  'Post-Impressionism': 0x2f4b7c,
+  'Rococo': 0x665191,
+  'Contemporary art': 0xa05195,
+  'Neoclassicism': 0xd45087,
+  'Italian Renaissance': 0xf95d6a,
+  'Academic art': 0xff7c43,
+  'Mannerism': 0xffa600,
+  'Abstract art': 0x1dabe6
+}
+
 
 /**
  * This class creates the depth plot geometry and stores the painting data.
@@ -80,6 +97,7 @@ export class DepthPlot {
       block.scale.setX(1);
       block.scale.setY(1);
     }
+    return null;
   }
 
   /**
@@ -108,7 +126,7 @@ export class DepthPlot {
   }
 
   /**
-   * Creates the X and Y axes.
+   * Creates the X axis.
    */
   private makeAxes() {
     this.makeXAxis();

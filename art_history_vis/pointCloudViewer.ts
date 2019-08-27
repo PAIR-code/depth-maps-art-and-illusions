@@ -45,7 +45,7 @@ const LINE_LENGTH_Z = 256;
  * point cloud three.js scene and loads the point cloud.
  */
 export class PointCloudViewer extends viewer.Viewer {
-  pointCloudGroup: THREE.Group;
+  pointCloudGroup: THREE.Group = new THREE.Group();
 
   /**
    * The constructor for the InfoViewer class.
@@ -57,7 +57,6 @@ export class PointCloudViewer extends viewer.Viewer {
     this.setCamera(CAMERA_POS_X, CAMERA_POS_Y, CAMERA_POS_Z,
       CAMERA_FOCAL_LENGTH);
 
-    this.pointCloudGroup = new THREE.Group();
     this.scene.add(this.pointCloudGroup)
 
     const offset = -125;
