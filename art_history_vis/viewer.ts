@@ -41,10 +41,10 @@ const CONTROLS_MIN_ZOOM = -5;
  */
 export class Viewer {
 
-  renderer: THREE.WebGLRenderer;
-  camera: THREE.PerspectiveCamera;
+  public renderer: THREE.WebGLRenderer;
+  public camera: THREE.PerspectiveCamera;
   public scene: THREE.Scene;
-  controls: OrbitControls;
+  public controls: OrbitControls;
 
   /**
    * The constructor for the Viewer class.
@@ -86,11 +86,11 @@ export class Viewer {
   }
 
   /**
-   *
-   * @param positionX
-   * @param positionY
-   * @param positionZ
-   * @param focalLength
+   * Sets the viewer's camera position and focal length.
+   * @param positionX the x position value to set.
+   * @param positionY the y position value to set.
+   * @param positionZ the z position value to set.
+   * @param focalLength the focal length value to set.
    */
   public setCamera(positionX: number, positionY: number, positionZ: number,
     focalLength: number) {
@@ -110,8 +110,6 @@ export class Viewer {
     this.controls.enableRotate = enableRotate;
     if (enableRotate) {
       this.controls.rotateSpeed = .5;
-      //todo: change
-      document.getElementById('reset-button').addEventListener('click', () => {this.controls.reset();});
     }
     this.controls.zoomSpeed = CONTROLS_ZOOM_SPEED;
     this.controls.keyPanSpeed = CONTROLS_PAN_SPEED;

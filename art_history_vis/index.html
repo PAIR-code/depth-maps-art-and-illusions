@@ -24,56 +24,39 @@ limitations under the License. -->
   <link rel="stylesheet"
         href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700"
         type="text/css">
-
 </head>
 
 <body>
   <div id="page">
-    <!-- <div id="loading-container"> -->
-    <!-- </div> -->
+    <!-- Loading spinner -->
+    <div id="load-spinner"
+         class="mdl-spinner
+      mdl-js-spinner
+      is-active"></div>
+    <!-- Contains the bottom graph and image views -->
     <div id="outer-container">
+      <!-- Depth plot graph -->
       <div id="depth-plot-container">
         <div id="legend-container"></div>
         <div id="axis-labels">
-          <!-- <div class="graph-title axis-label-text">Painting Depth in Art History</div> -->
-          <!-- <div class="axis-label-text">Select a dot on the graph to view the painting.</div> -->
-          <div id="instruction-text-graph">Select a dot on the graph to explore a painting in the
-            viewer.
+          <div id="instruction-text-graph">Select a dot on the graph to
+            explore a painting in the viewer.
           </div>
         </div>
         <canvas id="depth-plot-canvas"></canvas>
         <canvas id="texture-canvas"></canvas>
-
       </div>
-      <div id="image-view-wrapper">
-        <!-- <div id="image-view-container"
-             class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
-          <div id="tab-link-container"
-               class="mdl-tabs__tab-bar">
-            <a href="#1300-panel"
-               class="mdl-tabs__tab">1300-1399</a>
-            <a href="#1400-panel"
-               class="mdl-tabs__tab">1400-1499</a>
-            <a href="#1500-panel"
-               class="mdl-tabs__tab">1500-1599</a>
-            <a href="#1600-panel"
-               class="mdl-tabs__tab is-active">1600-1699</a>
-            <a href="#1700-panel"
-               class="mdl-tabs__tab">1700-1799</a>
-            <a href="#1800-panel"
-               class="mdl-tabs__tab">1800-1899</a>
-            <a href="#1900-panel"
-               class="mdl-tabs__tab">1900-2019</a>
-      </div>
-    </div> -->
-        <div id="image-view-container"></div>
+      <!-- Image view -->
+      <div id="image-view-outer-container">
+        <div id="image-view-container">
+          <div id="image-view-wrapper">
+          </div>
+        </div>
       </div>
     </div>
-    <div id="divider">
-      <div id="loading-bar"
-           class="mdl-spinner
-           mdl-js-spinner
-           is-active"></div>
+    <!-- Contains elements shared between the graph and image views -->
+    <div id="shared-container">
+      <!-- Toggle button -->
       <button class="mdl-button
            mdl-js-button
            mdl-button--raised
@@ -81,12 +64,16 @@ limitations under the License. -->
               id="switch-button">
         GRAPH MODE
       </button>
+      <!-- History -->
       <div id="history-text">history</div>
       <div id="history-container">
       </div>
     </div>
+    <!-- Top information panel -->
     <div id="info-container">
+      <!-- Colored background -->
       <div id="info-background">
+        <!-- Details text -->
         <div id="details-container">
           <h4 id="painting-title"
               class="art-text"></h4>
@@ -101,15 +88,19 @@ limitations under the License. -->
           <div id="range-text"
                class="art-text art-text-details"></div>
         </div>
+        <!-- Point cloud viewer -->
         <div id="point-cloud-container">
-          <div id="instruction-text">left-click to pan, right-click to tumble, scroll to zoom
+          <div id="instruction-text">left-click to pan, right-click to tumble,
+            scroll to zoom
           </div>
-          <button class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"
+          <button class="mdl-button mdl-js-button mdl-button--raised
+          mdl-js-ripple-effect"
                   id="reset-button">
             RESET
           </button>
           <canvas id="point-cloud-canvas"></canvas>
         </div>
+        <!-- Thumbnail images -->
         <div id="image-container">
           <div id="input-image">
             <div class="art-text-labels art-text-details">
@@ -125,6 +116,10 @@ limitations under the License. -->
             <img class="image"
                  id="depth-map">
           </div>
+        </div>
+        <!-- Attribution text -->
+        <div id="pair-text"> Web visualization by Google's People and AI
+          Research, in collaboration with Google Arts & Culture.
         </div>
       </div>
     </div>

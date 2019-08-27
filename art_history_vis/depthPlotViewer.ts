@@ -87,7 +87,7 @@ export class DepthPlotViewer extends Viewer {
 
     if (intersects.length > 0) {
       const intersection = intersects[0].object as THREE.Mesh;
-      if (intersection.uuid in this.depthPlot.blockToPainting) {
+      if (this.depthPlot.hasPainting(intersection.uuid)) {
         // Store the selected block's color before updating its appearance.
         this.currSelected = intersection;
         this.storedColor.copy(this.currSelected.material.color);

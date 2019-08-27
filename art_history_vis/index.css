@@ -26,7 +26,6 @@ body {
   overflow: hidden;
 }
 
-
 a {
   color: #004D40;
   text-decoration-line: none;
@@ -36,7 +35,13 @@ a:hover {
   color: #00B8D4;
 }
 
+#load-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
 
+/* CONTAINS DEPTH PLOT & IMAGE VIEWER */
 #outer-container {
   display: block;
   max-height: 450px;
@@ -145,14 +150,13 @@ a:hover {
 
 
 /* IMAGE GRIDVIEW */
-#image-view-wrapper {
+#image-view-outer-container {
   max-height: 300px;
 }
 
 #tabs-bar {
   margin-left: 200px;
   width: 820px;
-
 }
 
 #image-view-container {
@@ -167,21 +171,19 @@ a:hover {
   overflow: scroll;
 }
 
-.row {
+#image-view-wrapper {
   display: flex;
   flex-wrap: wrap;
-  /* padding-left: 5px; */
 }
 
 /* Create two equal columns that sits next to each other */
-.column {
+.grid-image-container {
   flex: 10%;
   max-width: 110px;
   max-height: 180px;
-  /* padding: 0 4px; */
 }
 
-.column img {
+.grid-image-container img {
   margin-top: 15px;
   margin-bottom: 5px;
   vertical-align: middle;
@@ -201,18 +203,13 @@ a:hover {
   height: 40px;
 }
 
-/* MIDDLE BAR */
-#divider {
+/* SHARED ELEMENTS */
+#shared-container {
   position: absolute;
   width: 100%;
   top: 410px;
   height: 30px;
   text-align: center;
-}
-
-#loading-bar {
-  display: inline-block;
-  top: 50%;
 }
 
 #switch-button {
@@ -226,7 +223,6 @@ a:hover {
   position: absolute;
   right: 15px;
   top: 15px;
-  /* visibility: hidden; */
 }
 
 
@@ -282,7 +278,6 @@ a:hover {
   position: absolute;
   left: 475px;
   right: 50px;
-  /* width: 100%; */
   min-width: 200px;
   height: 100%;
   text-align: center;
@@ -302,7 +297,6 @@ a:hover {
 
 #instruction-text-graph {
   position: absolute;
-  /* left: 25px; */
   top: 8px;
   width: 150px;
   text-align: left;
@@ -316,13 +310,12 @@ a:hover {
   position: absolute;
   width: 500px;
   height: 200px;
-  top: 180px;
+  top: 175px;
   vertical-align: middle;
 }
 
 #input-image {
   position: absolute;
-  /* top: 10%; */
   left: 40px;
   width: 190px;
   height: 140px;
@@ -341,4 +334,17 @@ a:hover {
   max-width: 100%;
   max-height: 100%;
   display: inline-block;
+}
+
+/* Attribution */
+#pair-text {
+  position: absolute;
+  left: 65px;
+  top: 360px;
+  width: 370px;
+  height: 50px;
+  font-family: Roboto;
+  line-height: 11px;
+  font-size: 11px;
+  opacity: .5;
 }
