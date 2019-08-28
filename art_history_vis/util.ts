@@ -1,3 +1,5 @@
+import {Color} from "three";
+
 /**
  * @license
  * Copyright 2018 Google LLC. All Rights Reserved.
@@ -15,9 +17,27 @@
  * =============================================================================
  */
 
+// Constants
+export const ART_STYLE_COLOR_MAP: {[id: string]: number} = {
+  'Baroque': 0xfc4e51,
+  'Renaissance': 0xc3ced0,
+  'Romanticism': 0x1dabe6,
+  'Realism': 0x1c366a,
+  'Dutch Golden Age': 0xaf060f,
+  'Impressionism': 0x003f5c,
+  'Post-Impressionism': 0x2f4b7c,
+  'Rococo': 0x665191,
+  'Contemporary art': 0xa05195,
+  'Neoclassicism': 0xd45087,
+  'Italian Renaissance': 0xf95d6a,
+  'Academic art': 0xff7c43,
+  'Mannerism': 0xffa600,
+  'Abstract art': 0xe43034
+}
+
 /**
- * Represents a single painting from the GAC dataset.
- */
+* Represents a single painting from the GAC dataset.
+*/
 export interface Painting {
   imageid: string;
   image: string,
@@ -40,7 +60,7 @@ export interface Painting {
  * Gets the context of an image DOM element.
  * @param image: the Image DOM element.
  */
-export function getImageContext(image: Image) {
+export function getImageContext(image: HTMLImageElement) {
   const canvas = document.createElement('canvas');
   canvas.width = image.width * 2;
   canvas.height = image.height * 2;
@@ -64,8 +84,16 @@ export function getPixelDataFromContext(context: CanvasRenderingContext2D,
 }
 
 /**
+ * Gets the color value for a given style.
+ * @param style the string with the name of the style.
+ */
+export function getStyleColor(style: string) {
+  return ART_STYLE_COLOR_MAP[style] || null;
+}
+
+/**
  * Delays the execution of a given function by a number of milliseconds.
- * @param delayTime the amount of time to delay by (in millisec.)
+ * @param delayTime the amount of time to delay by(in millisec.)
  * @param delayedFunction the function to debounce.
  */
 export function debounced(delayTime: number, delayedFunction: Function) {

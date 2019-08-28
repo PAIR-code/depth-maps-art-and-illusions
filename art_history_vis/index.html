@@ -16,41 +16,125 @@ limitations under the License. -->
 <meta charset="utf-8">
 <title>Depth in Art History</title>
 
+<head>
+  <link rel="stylesheet"
+        href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+  <script defer
+          src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+  <link rel="stylesheet"
+        href="http://fonts.googleapis.com/css?family=Roboto:300,400,500,700"
+        type="text/css">
+</head>
+
 <body>
-  <canvas id="depth-plot-canvas"></canvas>
-  <div id="info-container">
-    <div id="info-background"></div>
-    <div id="details-container">
-      <h4 id="painting-title"
-          class="art-text"></h4>
-      <div id="artist-text"
-           class="art-text art-text-details"></div>
-      <div id="year-text"
-           class="art-text art-text-details"></div>
-      <div id="style-text"
-           class="art-text art-text-details"></div>
-      <div id="partner-text"
-           class="art-text art-text-details"></div>
-      <div id="range-text"
-           class="art-text art-text-details"></div>
-    </div>
-    <div id="point-cloud-container">
-      <canvas id="point-cloud-canvas"></canvas>
-    </div>
-    <div id="image-container">
-      <div id="input-image">
-        <div class="art-text-details">
-          Original Painting
+  <div id="page">
+    <!-- Loading spinner -->
+    <div id="load-spinner"
+         class="mdl-spinner
+      mdl-js-spinner
+      is-active"></div>
+    <!-- Contains the bottom graph and image views -->
+    <div id="outer-container">
+      <!-- Depth plot graph -->
+      <div id="depth-plot-container">
+        <div id="legend-container"></div>
+        <div id="axis-labels">
+          <div id="instruction-text-graph">Select a dot on the graph to
+            explore a painting in the viewer.
+          </div>
         </div>
-        <img class="image"
-             id="original-painting">
+        <canvas id="depth-plot-canvas"></canvas>
+        <canvas id="texture-canvas"></canvas>
       </div>
-      <div id="output-image">
-        <div class="art-text-details">
-          Depth Map
+      <!-- Image view -->
+      <div id="image-view-outer-container">
+        <div id="image-view-container">
+          <div id="image-view-wrapper">
+          </div>
         </div>
-        <img class="image"
-             id="depth-map">
+      </div>
+    </div>
+    <!-- Contains elements shared between the graph and image views -->
+    <div id="shared-container">
+      <!-- Toggle button -->
+      <button class="mdl-button
+           mdl-js-button
+           mdl-button--raised
+           mdl-button--colored"
+              id="switch-button">
+        GRAPH MODE
+      </button>
+      <!-- History -->
+      <div id="history-text">history</div>
+      <div id="history-container">
+      </div>
+    </div>
+    <!-- Top information panel -->
+    <div id="info-container">
+      <!-- Colored background -->
+      <div id="info-background">
+        <!-- Details text -->
+        <div id="details-container">
+          <h4 id="painting-title"
+              class="art-text"></h4>
+          <div id="artist-text"
+               class="art-text art-text-details"></div>
+          <div id="year-text"
+               class="art-text art-text-details"></div>
+          <div id="style-text"
+               class="art-text art-text-details"></div>
+          <div id="partner-text"
+               class="art-text art-text-details"></div>
+          <div id="range-text"
+               class="art-text art-text-details"></div>
+        </div>
+        <!-- Point cloud viewer -->
+        <div id="point-cloud-container">
+          <div id="instruction-text">left-click to pan, right-click to tumble,
+            scroll to zoom
+          </div>
+          <button class="mdl-button mdl-js-button mdl-button--raised
+          mdl-js-ripple-effect"
+                  id="reset-button">
+            RESET
+          </button>
+          <canvas id="point-cloud-canvas"></canvas>
+        </div>
+        <!-- Thumbnail images -->
+        <div id="image-container">
+          <div id="input-image">
+            <div class="art-text-labels art-text-details">
+              Original Painting
+            </div>
+            <img class="image"
+                 id="original-painting">
+          </div>
+          <div id="output-image">
+            <div class="art-text-labels art-text-details">
+              Depth Map
+            </div>
+            <img class="image"
+                 id="depth-map">
+          </div>
+        </div>
+        <!-- Attribution text -->
+        <div id="pair-text"> Visualization by Google's
+          <a target="_blank"
+             href="https://ai.google/research/teams/brain/pair">
+            People and AI Research</a>, in collaboration with
+          <a target="_blank"
+             href="https://artsandculture.google.com/">
+            Google Arts & Culture</a>. (See our
+          <a target="_blank"
+             href="https://github.com/PAIR-code/depth-maps-art-and-illusions">
+            GitHub
+          </a> and
+          <!-- TODO(ellenj): Link to blog post, once finalized.  -->
+          <a target="_blank"
+             href="">
+            blog post
+          </a>for more info.)
+        </div>
       </div>
     </div>
   </div>

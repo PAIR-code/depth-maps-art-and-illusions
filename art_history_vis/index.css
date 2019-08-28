@@ -15,51 +15,257 @@ limitations under the License. */
 
 h4 {
   margin-top: 0px;
-  font-family: 'sans serif';
-  text-transform: uppercase;
+  font-family: 'Roboto';
+  font-weight: bold;
+  font-size: 18px;
+
 }
 
 body {
   margin: 0px;
-}
-
-button {
-  position: absolute;
-  display: block;
-  z-index: 99;
-  left: 50%;
-  top: 50%;
+  overflow: hidden;
 }
 
 a {
-  color: black;
+  color: #004D40;
+  text-decoration-line: none;
 }
 
-#info-container {
+a:hover {
+  color: #00B8D4;
+}
+
+#load-spinner {
   position: absolute;
+  top: 50%;
+  left: 50%;
+}
+
+/* CONTAINS DEPTH PLOT & IMAGE VIEWER */
+#outer-container {
   display: block;
-  visibility: hidden;
-  bottom: 0%;
+  max-height: 450px;
   width: 100%;
-  height: 40%;
-  padding-top: 25px;
-  padding-bottom: 25px;
+  top: 425px;
+  position: absolute;
+  text-align: right;
+  visibility: hidden;
+}
+
+/* DEPTH PLOT */
+#depth-plot-container {
+  width: 100%;
+  height: 100%;
+}
+
+#depth-plot-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+#texture-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* DEPTH PLOT LEGEND */
+#legend-container {
+  position: absolute;
+  top: 55px;
+  left: 60px;
+  width: 140px;
+  height: 240px;
+  background: #fefefe;
+  opacity: .8;
+}
+
+#axis-labels {
+  position: absolute;
+  left: 65px;
+  top: 240px;
+}
+
+.graph-title {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.axis-label-text {
+  font-size: 12px;
+  text-align: left;
+  font-family: Roboto;
+}
+
+.legend-item {
+  width: 100%;
+  height: 12px;
+}
+
+.legend-text {
+  position: absolute;
+  left: 20px;
+  margin: 3px;
+  font-size: 11px;
+  font-family: Roboto;
+}
+
+.legend-color {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  margin: 7px;
+  opacity: 0.7;
+}
+
+/* DEPTH PLOT HISTORY */
+#history-container {
+  position: absolute;
+  top: 65px;
+  right: 15px;
+  width: 25px;
+  height: 290px;
+}
+
+#history-text {
+  position: absolute;
+  font-family: Roboto;
+  font-size: 11px;
+  text-align: center;
+  top: 45px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  visibility: hidden;
+}
+
+.history-element {
+  margin: 2px;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.history-element:hover {
+  opacity: .8;
+}
+
+
+/* IMAGE GRIDVIEW */
+#image-view-outer-container {
+  max-height: 300px;
+}
+
+#tabs-bar {
+  margin-left: 200px;
+  width: 820px;
+}
+
+#image-view-container {
+  position: absolute;
+  left: 65px;
+  right: 35px;
+  margin-top: 50px;
+  margin-right: 20px;
+  display: none;
+  height: 295px;
+  background: #ECEFF1;
+  overflow: scroll;
+}
+
+#image-view-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* Create two equal columns that sits next to each other */
+.grid-image-container {
+  flex: 10%;
+  max-width: 110px;
+  max-height: 180px;
+}
+
+.grid-image-container img {
+  margin-top: 15px;
+  margin-bottom: 5px;
+  vertical-align: middle;
+  width: 100px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.thumbnail-title {
+  font-size: 10.5px;
+  text-align: left;
+  margin-bottom: 5px;
+  width: 92%;
+  display: inline-block;
+  line-height: 11px;
+  overflow-wrap: initial;
+  height: 40px;
+}
+
+/* SHARED ELEMENTS */
+#shared-container {
+  position: absolute;
+  width: 100%;
+  top: 410px;
+  height: 30px;
+  text-align: center;
+}
+
+#switch-button {
+  position: absolute;
+  left: 65px;
+  top: 15px;
+  visibility: hidden;
+}
+
+#reset-button {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+}
+
+
+/* INFORMATION PANEL */
+#info-container {
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 410px;
+  background: #ECEFF1;
+  visibility: hidden;
 }
 
 #info-background {
-  background: #6699CC;
-  opacity: 0.2;
   width: 100%;
-  height: 100%;
-  top: 0px;
+  height: 92%;
+  top: 4%;
+  bottom: 4%;
   position: absolute;
 }
 
+
+/* DETAILS BLOCK */
 #details-container {
   position: absolute;
-  width: 250px;
+  width: 100%;
   height: 100%;
-  right: 65px;
+  left: 65px;
+}
+
+.art-text {
+  text-align: left;
+}
+
+.art-text-labels {
+  margin-bottom: 5px;
+}
+
+.art-text-details {
+  font-size: 12px;
+  font-family: 'Roboto';
+  color: #37474F;
 }
 
 #gac-logo {
@@ -68,11 +274,13 @@ a {
   left: 10px;
 }
 
+/* POINT CLOUD */
 #point-cloud-container {
   position: absolute;
-  left: 375px;
-  right: 375px;
-  height: 80%;
+  left: 475px;
+  right: 50px;
+  min-width: 200px;
+  height: 100%;
   text-align: center;
 }
 
@@ -80,42 +288,64 @@ a {
   display: inline-block;
 }
 
+#instruction-text {
+  position: absolute;
+  left: 25px;
+  top: 15px;
+  opacity: 0.5;
+  font-style: italic
+}
+
+#instruction-text-graph {
+  position: absolute;
+  top: 8px;
+  width: 150px;
+  text-align: left;
+  line-height: 14px;
+  opacity: 0.5;
+  font-style: italic
+}
+
+/* 2D IMAGES */
 #image-container {
   position: absolute;
-  left: 100px;
-  width: 250px;
-  height: 100%;
+  width: 500px;
+  height: 200px;
+  top: 175px;
+  vertical-align: middle;
 }
 
 #input-image {
-  top: 5%;
-  width: 225px;
-  height: 170px;
+  position: absolute;
+  left: 40px;
+  width: 190px;
+  height: 140px;
   text-align: center;
 }
 
 #output-image {
   position: absolute;
-  width: 225px;
-  height: 170px;
-  top: 250px;
+  width: 190px;
+  height: 140px;
+  left: 220px;
   text-align: center;
 }
 
 .image {
   max-width: 100%;
   max-height: 100%;
-  /* display: inline-block; */
+  display: inline-block;
 }
 
-.art-text {
-  text-align: left;
-  padding-left: 10px;
-  padding-right: 50px;
-}
-
-.art-text-details {
-  font-size: 14px;
-  font-family: 'sans serif';
-  margin-bottom: 8px;
+/* Attribution */
+#pair-text {
+  position: absolute;
+  left: 65px;
+  top: 360px;
+  width: 370px;
+  height: 50px;
+  font-family: Roboto;
+  line-height: 11px;
+  font-size: 11px;
+  opacity: .5;
 }

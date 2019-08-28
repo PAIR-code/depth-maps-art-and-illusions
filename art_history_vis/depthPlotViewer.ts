@@ -22,14 +22,17 @@ import {Painting} from './util';
 import {Color} from 'three';
 
 // Constants
-const SELECTED_COLOR = 0x000000;
+const SELECTED_COLOR = 0xFF1493;
+const DEPTH_PLOT_CONTROLS_ZOOM_SPEED = 5;
 
 
 // Calculates mouse position in normalized device coordinates for RayCasting.
 const mouse = new THREE.Vector2();
 window.addEventListener('mousemove', (event: any) => {
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+  const outerContainerElement = document.getElementById('outer-container');
+  mouse.x = (event.clientX / outerContainerElement.clientWidth) * 2 - 1;
+  mouse.y = - ((event.clientY - outerContainerElement.offsetTop) /
+    outerContainerElement.clientHeight) * 2 + 1;
 }, false);
 
 
@@ -56,16 +59,17 @@ export class DepthPlotViewer extends Viewer {
     super(canvas, width, height, enableRotate);
     this.depthPlot = new DepthPlot(this.scene,
       paintings);
+    this.controls.zoomSpeed = DEPTH_PLOT_CONTROLS_ZOOM_SPEED;
 
     this.animate();
   }
+
 
   /**
    * This method is called to update the canvas at each frame.
    */
   public animate() {
     requestAnimationFrame(() => this.animate());
-
     this.renderer.render(this.scene, this.camera);
   }
 
@@ -84,12 +88,15 @@ export class DepthPlotViewer extends Viewer {
     const intersects = this.raycaster.intersectObjects(this.scene.children, true);
 
     if (intersects.length > 0) {
-      this.currSelected = intersects[0].object as THREE.Mesh;
-      // Store the selected block's color before updating its appearance.
-      this.storedColor.copy(this.currSelected.material.color);
+      const intersection = intersects[0].object as THREE.Mesh;
+      if (this.depthPlot.hasPainting(intersection.uuid)) {
+        // Store the selected block's color before updating its appearance.
+        this.currSelected = intersection;
+        this.storedColor.copy(this.currSelected.material.color);
 
-      this.depthPlot.updateBlock(this.currSelected,
-        new THREE.Color(SELECTED_COLOR), true)
+        this.depthPlot.updateBlock(this.currSelected,
+          new THREE.Color(SELECTED_COLOR), true);
+      }
     }
   }
 
@@ -99,6 +106,9 @@ export class DepthPlotViewer extends Viewer {
    * @return the selected Painting.
    */
   public getSelectedPainting(): Painting {
-    return this.depthPlot.getPainting(this.currSelected.uuid);
+    if (this.currSelected != null) {
+      return this.depthPlot.getPainting(this.currSelected.uuid);
+    }
+    return null;
   }
 }

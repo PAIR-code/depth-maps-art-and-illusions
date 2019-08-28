@@ -21,24 +21,36 @@ import * as viewer from './viewer';
 import * as util from './util';
 
 // Constants
-const NUM_POINTS = 200;
-
-const X_TRANSLATE = -50;
-const Y_TRANSLATE = -50;
-const Z_TRANSLATE = -50;
-const X_SCALE = 0.2;
-const Y_SCALE = 0.2;
-const Z_SCALE = 0.33;
-const POINT_CLOUD_WIDTH = 340;
-const POINT_CLOUD_HEIGHT = 340;
+const X_TRANSLATE = -150;
+const Y_TRANSLATE = -100;
+const Z_TRANSLATE = -250;
+const X_SCALE = 1;
+const Y_SCALE = 1;
+const Z_SCALE = 2;
+const CAMERA_POS_X = -150;
+const CAMERA_POS_Y = 100;
+const CAMERA_POS_Z = -250;
+const CAMERA_FOCAL_LENGTH = 20;
+const POINT_CLOUD_WIDTH = 280;
+const POINT_CLOUD_HEIGHT = 280;
 const POINT_CLOUD_ROTATE_Y = -0.6;
+
+const LINE_THICKNESS = 1;
+const LINE_LENGTH_Z = 256;
+const LINE_OPACITY = .06;
+const LINE_COLOR = 0x555555;
+const Z_OFFSET = 125;
+
+const MAX_Z_DEPTH = 255;
+const BOUNDING_GRID_START = 5;
+const BOUNDING_GRID_INTERVAL = 10;
 
 /**
  * This class extends Viewer, which creates a three.js scene. It sets up the
  * point cloud three.js scene and loads the point cloud.
  */
 export class PointCloudViewer extends viewer.Viewer {
-  pointCloudGroup: THREE.Group = new THREE.Group();
+  private pointCloudGroup: THREE.Group = new THREE.Group();
 
   /**
    * The constructor for the InfoViewer class.
@@ -47,9 +59,104 @@ export class PointCloudViewer extends viewer.Viewer {
   constructor(canvas: HTMLCanvasElement, width: number, height: number,
     enableRotate: boolean) {
     super(canvas, width, height, enableRotate);
-    this.scene.add(this.pointCloudGroup)
+    this.setCamera(CAMERA_POS_X, CAMERA_POS_Y, CAMERA_POS_Z,
+      CAMERA_FOCAL_LENGTH);
+
+    this.scene.add(this.pointCloudGroup);
+    this.makeBoundingGrid();
 
     super.animate();
+  }
+
+  /**
+   * Makes the point cloud viewer's bounding grid lines.
+   */
+  private makeBoundingGrid() {
+    this.makeBoundingGridXYLines();
+    this.makeBoundingGridZLines();
+  }
+
+  /**
+   * Makes the bounding grid lines in the x and y directions
+   */
+  private makeBoundingGridXYLines() {
+    const minXPosition = 0;
+    const minYPosition = 0;
+    const maxYPosition = POINT_CLOUD_HEIGHT;
+    const offsetXPosition = POINT_CLOUD_WIDTH / 2;
+    const offsetYPosition = POINT_CLOUD_HEIGHT / 2;
+
+    const widthX = POINT_CLOUD_WIDTH;
+    const heightX = LINE_THICKNESS;
+    const depthX = LINE_THICKNESS;
+
+    const widthY = LINE_THICKNESS;
+    const heightY = POINT_CLOUD_HEIGHT;
+    const depthY = LINE_THICKNESS;
+
+    for (let currZ = BOUNDING_GRID_START; currZ <= MAX_Z_DEPTH;
+      currZ += BOUNDING_GRID_INTERVAL) {
+      // Horizontal lines on the bottom
+      this.makeLine(offsetXPosition, minYPosition, currZ + Z_OFFSET,
+        widthX, heightX, depthX);
+      // Horizontal lines on the top
+      this.makeLine(offsetXPosition, maxYPosition, currZ + Z_OFFSET,
+        widthX, heightX, depthX);
+      // Vertical lines on the left
+      this.makeLine(minXPosition, offsetYPosition, currZ + Z_OFFSET,
+        widthY, heightY, depthY);
+    }
+  }
+
+  /**
+   * Makes the 4 bounding grid lines in the z direction.
+   */
+  private makeBoundingGridZLines() {
+    const minXPosition = 0;
+    const minYPosition = 0;
+    const maxXPosition = POINT_CLOUD_WIDTH;
+    const maxYPosition = POINT_CLOUD_HEIGHT;
+    const zPosition = LINE_LENGTH_Z;
+
+    const width = LINE_THICKNESS;
+    const height = LINE_THICKNESS;
+    const depth = LINE_LENGTH_Z;
+
+    this.makeLine(minXPosition, minYPosition, zPosition,
+      width, height, depth);  // Lower left line
+    this.makeLine(maxXPosition, minYPosition, zPosition,
+      width, height, depth);  // Lower right line
+    this.makeLine(maxXPosition, maxYPosition, zPosition,
+      width, height, depth);  // Upper right line
+    this.makeLine(minXPosition, maxYPosition, zPosition,
+      width, height, depth);  // Upper left line
+  }
+
+  /**
+   * Makes a line with the given settings.
+   * @param positionX the x position of the line.
+   * @param positionY the y position of the line.
+   * @param positionZ the z position of the line.
+   * @param width the width of the line.
+   * @param height the height of the line.
+   * @param depth the depth of the line.
+   */
+  private makeLine(positionX: number, positionY: number, positionZ: number,
+    width: number, height: number, depth: number) {
+    const geometry = new THREE.BoxBufferGeometry(width, height, depth);
+    geometry.translate(
+      X_TRANSLATE + positionX,
+      Y_TRANSLATE + positionY,
+      Z_TRANSLATE + positionZ);
+    geometry.scale(X_SCALE, Y_SCALE, Z_SCALE);
+    geometry.rotateY(POINT_CLOUD_ROTATE_Y);
+
+    const material = new THREE.MeshLambertMaterial({
+      color: LINE_COLOR,
+      transparent: true,
+      opacity: LINE_OPACITY
+    });
+    this.scene.add(new THREE.Mesh(geometry, material));
   }
 
   /**
@@ -63,7 +170,7 @@ export class PointCloudViewer extends viewer.Viewer {
     const pointsGeometry = this.updatePointsGeometry(originalPaintingContext,
       depthMapContext);
     const pointsMaterial = new THREE.PointsMaterial({
-      size: 5,
+      size: 4,
       vertexColors: THREE.VertexColors
     });
     this.pointCloudGroup.add(new Points(pointsGeometry, pointsMaterial));
@@ -82,10 +189,8 @@ export class PointCloudViewer extends viewer.Viewer {
     const positions = [];
     const colors = [];
 
-    const widthStep = POINT_CLOUD_WIDTH / NUM_POINTS;
-    const heightStep = POINT_CLOUD_HEIGHT / NUM_POINTS;
-    for (let i = 0; i < POINT_CLOUD_WIDTH; i += widthStep) {
-      for (let j = 1; j < POINT_CLOUD_HEIGHT; j += heightStep) {
+    for (let i = 0; i < POINT_CLOUD_WIDTH; i += 1) {
+      for (let j = 1; j < POINT_CLOUD_HEIGHT; j += 1) {
         const depthPixelData = util.getPixelDataFromContext(depthMapContext,
           i, j);
         const originalPixelData = util.getPixelDataFromContext(
