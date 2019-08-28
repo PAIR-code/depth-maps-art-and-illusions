@@ -25,10 +25,6 @@ import {
 
 // Constants
 const PAGE_LOAD_PAINTING_ID = 'rQE3Vym-EKB_9Q';
-// const LEGEND_STYLES = ['Baroque', 'Renaissance', 'Romanticism', 'Realism', 'Dutch Golden Age',
-//   'Impressionism', 'Post-Impressionism', 'Rococo', 'Contemporary art',
-//   'Neoclassicism', 'Italian Renaissance', 'Academic art', 'Mannerism',
-//   'Abstract art'];
 const STORAGE_PATH = 'https://storage.googleapis.com/art_history_depth_data/GAC_images';
 const INPUT_FILENAME = 'input.png';
 const OUTPUT_FILENAME = 'output.png';
