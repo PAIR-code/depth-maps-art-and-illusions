@@ -1,3 +1,5 @@
+import {Color} from "three";
+
 /**
  * @license
  * Copyright 2018 Google LLC. All Rights Reserved.
@@ -16,11 +18,11 @@
  */
 
 // Constants
-const ART_STYLE_COLOR_MAP = {
-  'Baroque': 0x1c366a,
+export const ART_STYLE_COLOR_MAP: {[id: string]: number} = {
+  'Baroque': 0xfc4e51,
   'Renaissance': 0xc3ced0,
-  'Romanticism': 0xe43034,
-  'Realism': 0xfc4e51,
+  'Romanticism': 0x1dabe6,
+  'Realism': 0x1c366a,
   'Dutch Golden Age': 0xaf060f,
   'Impressionism': 0x003f5c,
   'Post-Impressionism': 0x2f4b7c,
@@ -30,7 +32,7 @@ const ART_STYLE_COLOR_MAP = {
   'Italian Renaissance': 0xf95d6a,
   'Academic art': 0xff7c43,
   'Mannerism': 0xffa600,
-  'Abstract art': 0x1dabe6
+  'Abstract art': 0xe43034
 }
 
 /**
@@ -58,7 +60,7 @@ export interface Painting {
  * Gets the context of an image DOM element.
  * @param image: the Image DOM element.
  */
-export function getImageContext(image: Image) {
+export function getImageContext(image: HTMLImageElement) {
   const canvas = document.createElement('canvas');
   canvas.width = image.width * 2;
   canvas.height = image.height * 2;
@@ -86,10 +88,7 @@ export function getPixelDataFromContext(context: CanvasRenderingContext2D,
  * @param style the string with the name of the style.
  */
 export function getStyleColor(style: string) {
-  if (style in ART_STYLE_COLOR_MAP) {
-    return ART_STYLE_COLOR_MAP[style];
-  }
-  return null;
+  return ART_STYLE_COLOR_MAP[style] || null;
 }
 
 /**

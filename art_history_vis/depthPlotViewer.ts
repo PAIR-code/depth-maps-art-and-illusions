@@ -23,15 +23,16 @@ import {Color} from 'three';
 
 // Constants
 const SELECTED_COLOR = 0xFF1493;
+const DEPTH_PLOT_CONTROLS_ZOOM_SPEED = 5;
 
 
 // Calculates mouse position in normalized device coordinates for RayCasting.
 const mouse = new THREE.Vector2();
 window.addEventListener('mousemove', (event: any) => {
-  const depthContainer = document.getElementById('outer-container');
-  mouse.x = (event.clientX / depthContainer.clientWidth) * 2 - 1;
-  mouse.y = - ((event.clientY - 425) /
-    depthContainer.clientHeight) * 2 + 1;
+  const outerContainerElement = document.getElementById('outer-container');
+  mouse.x = (event.clientX / outerContainerElement.clientWidth) * 2 - 1;
+  mouse.y = - ((event.clientY - outerContainerElement.offsetTop) /
+    outerContainerElement.clientHeight) * 2 + 1;
 }, false);
 
 
@@ -58,6 +59,7 @@ export class DepthPlotViewer extends Viewer {
     super(canvas, width, height, enableRotate);
     this.depthPlot = new DepthPlot(this.scene,
       paintings);
+    this.controls.zoomSpeed = DEPTH_PLOT_CONTROLS_ZOOM_SPEED;
 
     this.animate();
   }

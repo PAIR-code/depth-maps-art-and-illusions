@@ -20,9 +20,10 @@ import * as THREE from 'three';
 import {Painting, getStyleColor} from './util';
 
 // Constants
-const SCENE_UNIT_LENGTH = 0.18;
-const SCENE_X_TRANSLATE = 17;
-const SCENE_Y_TRANSLATE = -7;
+const SCENE_UNIT_LENGTH = .5;
+const SCENE_X_TRANSLATE = 75;
+const SCENE_Y_TRANSLATE = -15;
+const SCENE_Z_TRANSLATE = -300;
 
 const AXIS_COLOR = 0x999999;
 const X_AXIS_LENGTH = 10;
@@ -37,24 +38,27 @@ const GRAPH_END_YEAR = 2019;
 const OFFSET = (GRAPH_END_YEAR - GRAPH_START_YEAR) / 2;
 const TICK_INTERVAL = 100;
 
-const LABEL_WIDTH = 10, LABEL_HEIGHT = 5, LABEL_DEPTH = 1;
-const LABEL_FONT = '16pt Arial';
+const LABEL_CANVAS_HEIGHT = 200, LABEL_CANVAS_WIDTH = 400;
+const LABEL_WIDTH = 100, LABEL_HEIGHT = 50, LABEL_DEPTH = 1;
+const LABEL_FONT = '64pt Arial';
 const LABEL_BACKGROUND_COLOR = 'white';
 const LABEL_TEXT_COLOR = 'black';
 const LABEL_TEXT_ALIGN = "center";
 const LABEL_TEXT_BASELINE = "middle";
-const LABEL_Z_OFFSET = 10;
+const LABEL_Z_OFFSET = -10;
+const LABEL_SCALE = 0.25;
 
-const XAXIS_LABEL_OFFSET = -8;
-const YAXIS_LABEL_OFFSET = -70;
-const TICK_LABEL_OFFSET = -3;
+const XAXIS_LABEL_OFFSET = -45;
+const YAXIS_LABEL_OFFSET = -370;
+const TICK_LABEL_OFFSET_X = 7;
+const TICK_LABEL_OFFSET_Y = -25;
 
-const DEPTH_LABEL_TRANSLATE_Y = 20;
-const MIN_DEPTH_LABEL_TRANSLATE_Y = 1;
-const MAX_DEPTH_LABEL_TRANSLATE_Y = 45;
+const DEPTH_LABEL_TRANSLATE_Y = 140;
+const MIN_DEPTH_LABEL_TRANSLATE_Y = -10;
+const MAX_DEPTH_LABEL_TRANSLATE_Y = 240;
 
 const XAXIS_LABEL_TEXT = 'year';
-const YAXIS_LABEL_TEXT = 'depth';
+const YAXIS_LABEL_TEXT = ' depth';
 const MIN_DEPTH_LABEL_TEXT = '0';
 const MAX_DEPTH_LABEL_TEXT = '255';
 
@@ -168,7 +172,7 @@ export class DepthPlot {
     const deltaY = (depth / 2.0) + SCENE_UNIT_LENGTH * painting.range;
     const deltaZ = 0;
     geometry.translate(deltaX + SCENE_X_TRANSLATE,
-      deltaY + SCENE_Y_TRANSLATE, deltaZ);
+      deltaY + SCENE_Y_TRANSLATE, deltaZ + SCENE_Z_TRANSLATE);
 
     return geometry;
   }
@@ -177,8 +181,8 @@ export class DepthPlot {
    * Creates the X and Y axes.
    */
   private makeAxes() {
-    this.makeXAxis();
     this.makeYAxis();
+    this.makeXAxis();
   }
 
   /**
@@ -188,11 +192,12 @@ export class DepthPlot {
    */
   private makeLabelCanvas(label: string): HTMLCanvasElement {
     const canvas = document.createElement('canvas');
+    canvas.style.visibility = 'hidden';
     document.body.appendChild(canvas);
     const ctx = canvas.getContext('2d');
 
-    canvas.width = 100;
-    canvas.height = 50;
+    canvas.width = LABEL_CANVAS_WIDTH;
+    canvas.height = LABEL_CANVAS_HEIGHT;
 
     ctx.font = LABEL_FONT;
     ctx.fillStyle = LABEL_BACKGROUND_COLOR;
@@ -200,7 +205,7 @@ export class DepthPlot {
     ctx.fillStyle = LABEL_TEXT_COLOR;
     ctx.textAlign = LABEL_TEXT_ALIGN;
     ctx.textBaseline = LABEL_TEXT_BASELINE;
-    ctx.fillText(label, canvas.width / 2, canvas.height / 2);
+    ctx.fillText(label, LABEL_WIDTH, LABEL_HEIGHT);
     return canvas;
   }
 
@@ -222,8 +227,9 @@ export class DepthPlot {
     if (rotate) {
       geometry.rotateZ(Math.PI / 2.0);
     }
+    geometry.scale(LABEL_SCALE, LABEL_SCALE, 1);
     geometry.translate(SCENE_X_TRANSLATE + x, SCENE_Y_TRANSLATE + y,
-      LABEL_Z_OFFSET);
+      SCENE_Z_TRANSLATE + LABEL_Z_OFFSET);
 
     const mesh = new THREE.Mesh(geometry, material);
     this.scene.add(mesh);
@@ -239,7 +245,7 @@ export class DepthPlot {
     const height = SCENE_UNIT_LENGTH;
     const depth = SCENE_UNIT_LENGTH;
     const geometry = new THREE.BoxBufferGeometry(width, height, depth);
-    geometry.translate(SCENE_X_TRANSLATE, SCENE_Y_TRANSLATE, 0);
+    geometry.translate(SCENE_X_TRANSLATE, SCENE_Y_TRANSLATE, SCENE_Z_TRANSLATE);
 
     const material = new THREE.MeshLambertMaterial({
       color: AXIS_COLOR
@@ -250,7 +256,8 @@ export class DepthPlot {
     for (let i = GRAPH_START_YEAR; i < GRAPH_END_YEAR; i += TICK_INTERVAL) {
       this.makeXTick(i);
     }
-    this.makeLabel(XAXIS_LABEL_TEXT, 0, XAXIS_LABEL_OFFSET, false);
+    this.makeLabel(XAXIS_LABEL_TEXT,
+      0, XAXIS_LABEL_OFFSET * SCENE_UNIT_LENGTH, false);
   }
 
   /**
@@ -263,7 +270,8 @@ export class DepthPlot {
     const depth = SCENE_UNIT_LENGTH;
     const geometry = new THREE.BoxBufferGeometry(width, height, depth);
     geometry.translate(-SCENE_UNIT_LENGTH * OFFSET + SCENE_X_TRANSLATE,
-      SCENE_UNIT_LENGTH * Y_AXIS_LENGTH / 2 + SCENE_Y_TRANSLATE, 0);
+      SCENE_UNIT_LENGTH * Y_AXIS_LENGTH / 2 + SCENE_Y_TRANSLATE,
+      SCENE_Z_TRANSLATE);
 
     const material = new THREE.MeshLambertMaterial({
       color: AXIS_COLOR
@@ -271,12 +279,12 @@ export class DepthPlot {
     this.scene.add(new THREE.Mesh(geometry, material));
 
     // Make Y axis labels
-    this.makeLabel(YAXIS_LABEL_TEXT, YAXIS_LABEL_OFFSET,
-      DEPTH_LABEL_TRANSLATE_Y, true);
-    this.makeLabel(MIN_DEPTH_LABEL_TEXT, YAXIS_LABEL_OFFSET,
-      MIN_DEPTH_LABEL_TRANSLATE_Y, false);
-    this.makeLabel(MAX_DEPTH_LABEL_TEXT, YAXIS_LABEL_OFFSET,
-      MAX_DEPTH_LABEL_TRANSLATE_Y, false);
+    this.makeLabel(YAXIS_LABEL_TEXT, YAXIS_LABEL_OFFSET * SCENE_UNIT_LENGTH,
+      DEPTH_LABEL_TRANSLATE_Y * SCENE_UNIT_LENGTH, true);
+    this.makeLabel(MIN_DEPTH_LABEL_TEXT, YAXIS_LABEL_OFFSET * SCENE_UNIT_LENGTH,
+      MIN_DEPTH_LABEL_TRANSLATE_Y * SCENE_UNIT_LENGTH, false);
+    this.makeLabel(MAX_DEPTH_LABEL_TEXT, YAXIS_LABEL_OFFSET * SCENE_UNIT_LENGTH,
+      MAX_DEPTH_LABEL_TRANSLATE_Y * SCENE_UNIT_LENGTH, false);
   }
 
   /**
@@ -290,14 +298,17 @@ export class DepthPlot {
     const geometry = new THREE.BoxBufferGeometry(width, height, depth);
 
     const translateX = (year - GRAPH_START_YEAR - OFFSET) * SCENE_UNIT_LENGTH;
-    geometry.translate(translateX + SCENE_X_TRANSLATE, SCENE_Y_TRANSLATE, 0);
+    geometry.translate(translateX + SCENE_X_TRANSLATE, SCENE_Y_TRANSLATE,
+      SCENE_Z_TRANSLATE);
 
     const material = new THREE.MeshLambertMaterial({
       color: AXIS_COLOR,
     });
     this.scene.add(new THREE.Mesh(geometry, material));
 
-    this.makeLabel(year.toString(), translateX,
-      TICK_LABEL_OFFSET, false);
+    this.makeLabel(year.toString(),
+      translateX + TICK_LABEL_OFFSET_X,
+      TICK_LABEL_OFFSET_Y * SCENE_UNIT_LENGTH,
+      false);
   }
 }

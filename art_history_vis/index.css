@@ -114,6 +114,7 @@ a:hover {
   width: 9px;
   height: 9px;
   margin: 7px;
+  opacity: 0.7;
 }
 
 /* DEPTH PLOT HISTORY */

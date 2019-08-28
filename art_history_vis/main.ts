@@ -17,15 +17,18 @@
 
 import {DepthPlotViewer} from './depthPlotViewer';
 import {PointCloudViewer} from './pointCloudViewer';
-import {Painting, getImageContext, getStyleColor, debounced} from './util';
+import {
+  Painting, getImageContext, getStyleColor,
+  debounced, ART_STYLE_COLOR_MAP
+} from './util';
 
 
 // Constants
 const PAGE_LOAD_PAINTING_ID = 'rQE3Vym-EKB_9Q';
-const LEGEND_STYLES = ['Baroque', 'Renaissance', 'Romanticism', 'Realism', 'Dutch Golden Age',
-  'Impressionism', 'Post-Impressionism', 'Rococo', 'Contemporary art',
-  'Neoclassicism', 'Italian Renaissance', 'Academic art', 'Mannerism',
-  'Abstract art'];
+// const LEGEND_STYLES = ['Baroque', 'Renaissance', 'Romanticism', 'Realism', 'Dutch Golden Age',
+//   'Impressionism', 'Post-Impressionism', 'Rococo', 'Contemporary art',
+//   'Neoclassicism', 'Italian Renaissance', 'Academic art', 'Mannerism',
+//   'Abstract art'];
 const STORAGE_PATH = 'https://storage.googleapis.com/art_history_depth_data/GAC_images';
 const INPUT_FILENAME = 'input.png';
 const OUTPUT_FILENAME = 'output.png';
@@ -54,7 +57,7 @@ const historyContainer = document.getElementById('history-container');
  * Initializes the web visualization.
  * @param paintings an Array of the Painting objects (from the loaded data).
  */
-export function initialize(paintings: Array<Painting>, idToPaintingDict:
+export function main(paintings: Array<Painting>, idToPaintingDict:
   {[id: string]: Painting}) {
   // Initializes three.js scenes for the depth plot and point cloud.
   depthPlotViewer = new DepthPlotViewer(paintings,
@@ -158,7 +161,7 @@ function imageClicked(event: Event) {
  */
 function initializeLegend() {
   const legendDiv = document.getElementById('legend-container');
-  for (let style of LEGEND_STYLES) {
+  for (let style of Object.keys(ART_STYLE_COLOR_MAP)) {
     const itemDiv = document.createElement('div');
     itemDiv.className = 'legend-item';
     legendDiv.appendChild(itemDiv);

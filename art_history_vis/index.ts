@@ -16,7 +16,7 @@
  */
 
 import * as d3 from 'd3';
-import {initialize} from './initialize';
+import {main} from './main';
 import {Painting} from './util';
 
 /**
@@ -55,5 +55,5 @@ d3.csv('paintings.csv').then((data: object) => {
     idToPainting[imageid] = painting;
 
   }
-  initialize(paintings, idToPainting);
+  main(paintings, idToPainting);
 });
