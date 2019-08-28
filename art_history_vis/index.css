@@ -44,9 +44,11 @@ a:hover {
 /* CONTAINS DEPTH PLOT & IMAGE VIEWER */
 #outer-container {
   display: block;
-  max-height: 450px;
+  /* max-height: 450px; */
   width: 100%;
   top: 425px;
+  height: calc(100vh - 410px);
+
   position: absolute;
   text-align: right;
   visibility: hidden;
@@ -152,7 +154,9 @@ a:hover {
 
 /* IMAGE GRIDVIEW */
 #image-view-outer-container {
-  max-height: 300px;
+  /* max-height: 300px; */
+  position: relative;
+  height: calc(100vh - 500px);
 }
 
 #tabs-bar {
@@ -167,7 +171,7 @@ a:hover {
   margin-top: 50px;
   margin-right: 20px;
   display: none;
-  height: 295px;
+  height: 100%;
   background: #ECEFF1;
   overflow: scroll;
 }
@@ -213,11 +217,16 @@ a:hover {
   text-align: center;
 }
 
-#switch-button {
+#tab-container {
   position: absolute;
   left: 65px;
-  top: 15px;
+  top: 8px;
+  width: 220px;
   visibility: hidden;
+}
+
+.tab {
+  cursor: pointer;
 }
 
 #reset-button {

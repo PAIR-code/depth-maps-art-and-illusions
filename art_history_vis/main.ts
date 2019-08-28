@@ -30,6 +30,7 @@ const INPUT_FILENAME = 'input.png';
 const OUTPUT_FILENAME = 'output.png';
 const HISTORY_ELEMENT_CLASSNAME = 'history-element';
 const MAX_HISTORY_LENGTH = 11;
+const IMAGE_LOADING_BATCH_SIZE = 60;
 
 let depthPlotViewer: DepthPlotViewer;
 let pointCloudViewer: PointCloudViewer;
@@ -45,6 +46,9 @@ const pointCloudCanvasElement = document.getElementById('point-cloud-canvas');
 const outerContainerElement = document.getElementById('outer-container');
 const imageViewContainerElement = document.getElementById('image-view-container');
 const historyContainer = document.getElementById('history-container');
+const imageViewWrapperElement = document.getElementById('image-view-wrapper');
+const tabGraphElement = document.getElementById('tab-graph');
+const tabImagesElement = document.getElementById('tab-images');
 
 
 // UI Initialization Functions
@@ -80,7 +84,7 @@ export function main(paintings: Array<Painting>, idToPaintingDict:
  */
 function updateUIVisibility() {
   // Show application elements
-  document.getElementById('switch-button').style.visibility = 'visible';
+  document.getElementById('tab-container').style.visibility = 'visible';
   document.getElementById('info-container').style.visibility = 'visible';
   document.getElementById('history-text').style.visibility = 'visible';
   outerContainerElement.style.visibility = 'visible';
@@ -95,11 +99,19 @@ function updateUIVisibility() {
  */
 function initializeImageView(paintings: Array<Painting>) {
   // Sort the paintings by year.
-  const sortedPaintings = paintings.slice(0);
-  sortedPaintings.sort((a, b) => (
-    +(a.year) > +(b.year)) ? 1 : (+(b.year) > +(a.year)) ? -1 : 0
-  );
-  addPaintingsToImageView(sortedPaintings);
+  // const sortedPaintings = paintings.slice(0);
+  // sortedPaintings.sort((a, b) => (
+  //   +(a.year) > +(b.year)) ? 1 : (+(b.year) > +(a.year)) ? -1 : 0
+  // );
+  addPaintingsToImageView(paintings);
+
+  // Image Container scroll event listener
+  imageViewContainerElement.addEventListener('scroll', (event: Event) => {
+    const element = event.target as HTMLElement;
+    if (element.scrollHeight - element.scrollTop === element.clientHeight) {
+      addPaintingsToImageView(paintings);
+    }
+  });
 }
 
 /**
@@ -107,12 +119,17 @@ function initializeImageView(paintings: Array<Painting>) {
  * @param paintings an Array of the Painting objects (from the loaded data).
  */
 function addPaintingsToImageView(paintings: Array<Painting>) {
-  for (let j = 0; j < paintings.length; j += 100) {
-    const styles = paintings[j].style.split(', ');
+  let index = imageViewWrapperElement.children.length;
+  let paintingsAdded = 0;
+  while (paintingsAdded < IMAGE_LOADING_BATCH_SIZE) {
+    console.log('while');
+    const styles = paintings[index].style.split(', ');
     const firstStyleColor = getStyleColor(styles[0]);
-    if (firstStyleColor != null && paintings[j].year > 0) {
-      addPaintingToImageView(paintings[j]);
+    if (firstStyleColor != null && paintings[index].year > 0) {
+      addPaintingToImageView(paintings[index]);
+      paintingsAdded++;
     }
+    index++;
   }
 }
 
@@ -124,7 +141,7 @@ function addPaintingToImageView(painting: Painting) {
   // Create a container HTMLElement for the image.
   const gridImageContainer = document.createElement('div');
   gridImageContainer.className = 'grid-image-container';
-  document.getElementById('image-view-wrapper').appendChild(gridImageContainer);
+  imageViewWrapperElement.appendChild(gridImageContainer);
 
   // Create the image HTMLElement.
   const imageElement = document.createElement('img');
@@ -234,23 +251,27 @@ function addEventHandlers() {
     }
   }, false);
 
+  // Graph tab click event listener
+  tabGraphElement.addEventListener('click', (event: Event) => {
+    // Switch to 'graph mode,' showing and updating the resize of the depth
+    // plot and hiding the image view
+    depthPlotContainerElement.style.display = 'block';
+    depthPlotViewer.resize(outerContainerElement.clientWidth,
+      outerContainerElement.clientHeight);
+    imageViewContainerElement.style.display = 'none';
 
-  // Switch button click event listener
-  document.getElementById('switch-button').addEventListener('click', (event: Event) => {
-    if (depthPlotContainerElement.style.display == 'none') {
-      // Switch to 'graph mode,' showing and updating the resize of the depth
-      // plot and hiding the image view
-      event.target.innerHTML = 'GRAPH MODE';
-      depthPlotContainerElement.style.display = 'block';
-      depthPlotViewer.resize(outerContainerElement.clientWidth,
-        outerContainerElement.clientHeight);
-      imageViewContainerElement.style.display = 'none';
-    } else {
-      // Switch to 'image mode,' hiding the depth plot and showing the image view
-      event.target.innerHTML = 'IMAGE MODE';
-      depthPlotContainerElement.style.display = 'none';
-      imageViewContainerElement.style.display = 'block';
-    }
+    tabGraphElement.classList.add('is-active');
+    tabImagesElement.classList.remove('is-active');
+  });
+
+  // Images tab click event listener
+  tabImagesElement.addEventListener('click', (event: Event) => {
+    // Switch to 'image mode,' hiding the depth plot and showing the image view
+    depthPlotContainerElement.style.display = 'none';
+    imageViewContainerElement.style.display = 'block';
+
+    tabImagesElement.classList.add('is-active');
+    tabGraphElement.classList.remove('is-active');
   });
 }
 
