@@ -98,11 +98,6 @@ function updateUIVisibility() {
  * @param paintings an Array of the Painting objects (from the loaded data).
  */
 function initializeImageView(paintings: Array<Painting>) {
-  // Sort the paintings by year.
-  // const sortedPaintings = paintings.slice(0);
-  // sortedPaintings.sort((a, b) => (
-  //   +(a.year) > +(b.year)) ? 1 : (+(b.year) > +(a.year)) ? -1 : 0
-  // );
   addPaintingsToImageView(paintings);
 
   // Image Container scroll event listener
