@@ -122,7 +122,6 @@ function addPaintingsToImageView(paintings: Array<Painting>) {
   let index = imageViewWrapperElement.children.length;
   let paintingsAdded = 0;
   while (paintingsAdded < IMAGE_LOADING_BATCH_SIZE) {
-    console.log('while');
     const styles = paintings[index].style.split(', ');
     const firstStyleColor = getStyleColor(styles[0]);
     if (firstStyleColor != null && paintings[index].year > 0) {
