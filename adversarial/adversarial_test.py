@@ -96,7 +96,8 @@ class AdversarialTest(googletest.TestCase):
         [[0,0,0],[2,2,2]],
         [[0,0,0],[6,6,6]]
       ]])
-
+    # A simple loss function that is the value difference between the input and
+    # target images, which encourages the input values to get closer the target.
     loss_gradient_function = lambda x: [np.mean(x - target_image),
       (x - target_image)[0]]
 
@@ -132,6 +133,8 @@ class AdversarialTest(googletest.TestCase):
         [[0,0,0],[6,6,6]]
       ]],
       dtype='float64')
+    # A simple loss function that is the value difference between the input and
+    # target images, which encourages the input values to get closer the target.
     loss_gradient_function = lambda x: [np.mean(x - target_image),
       (x - target_image)[0]]
     iterations = 2
