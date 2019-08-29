@@ -29,6 +29,8 @@ class AdversarialTest(googletest.TestCase):
   """
 
   def testGetInputs(self):
+    """Tests that the get_inputs function returns the input and target output.
+    """
     loaded_image_array = np.array(
       [[
         [[1,1,1],[2,2,2]],
@@ -48,14 +50,17 @@ class AdversarialTest(googletest.TestCase):
       return_value=predict_array)
     model = mock.Mock()
 
-    input_image, output_image = adversarial_depth.get_inputs(
+    input_image, target_output = adversarial_depth.get_inputs(
       depth_model_wrapper, model, 'path', 'path')
 
     self.assertTrue(np.array_equal(loaded_image_array, input_image))
-    self.assertTrue(np.array_equal(predict_array, output_image))
+    self.assertTrue(np.array_equal(predict_array, target_output))
 
 
   def testToMultichannel(self):
+    """Tests that the to_multichannel function returns the expected
+        multichannel array.
+    """
     single_channel_image = np.array(
       [
         [[1],[2]],
@@ -78,6 +83,9 @@ class AdversarialTest(googletest.TestCase):
 
 
   def testRetrieveLossAndGradients(self):
+    """Tests that the retrieve_loss_and_gradients function returns the expected
+        loss and gradients values, given a simple loss_gradient_function.
+    """
     input_image = np.array(
       [[
         [[1,1,1],[2,2,2]],
@@ -109,6 +117,9 @@ class AdversarialTest(googletest.TestCase):
 
 
   def testGradientAscent(self):
+    """Tests that the retrieve_loss_and_gradients function returns the expected
+        array output, given a simple loss_gradient_function.
+    """
     input_image = np.array(
       [[
         [[1,1,1],[2,2,2]],
