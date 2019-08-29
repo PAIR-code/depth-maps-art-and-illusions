@@ -26,13 +26,13 @@ export const ART_STYLE_COLOR_MAP: {[id: string]: number} = {
   'Dutch Golden Age': 0xaf060f,
   'Impressionism': 0x003f5c,
   'Post-Impressionism': 0x2f4b7c,
-  'Rococo': 0x665191,
   'Contemporary art': 0xa05195,
   'Neoclassicism': 0xd45087,
   'Italian Renaissance': 0xf95d6a,
   'Academic art': 0xff7c43,
   'Mannerism': 0xffa600,
-  'Abstract art': 0xe43034
+  'Abstract art': 0xe43034,
+  'Ukiyo-e': 0x665191
 }
 
 /**
