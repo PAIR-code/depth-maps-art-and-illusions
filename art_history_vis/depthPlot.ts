@@ -20,8 +20,8 @@ import * as THREE from 'three';
 import {Painting, getStyleColor} from './util';
 
 // Constants
-const SCENE_UNIT_LENGTH = .5;
-const SCENE_X_TRANSLATE = 75;
+const SCENE_UNIT_LENGTH = .4;
+const SCENE_X_TRANSLATE = 34;
 const SCENE_Y_TRANSLATE = -15;
 const SCENE_Z_TRANSLATE = -300;
 
@@ -46,7 +46,7 @@ const LABEL_TEXT_COLOR = 'black';
 const LABEL_TEXT_ALIGN = "center";
 const LABEL_TEXT_BASELINE = "middle";
 const LABEL_Z_OFFSET = -10;
-const LABEL_SCALE = 0.25;
+const LABEL_SCALE = 0.20;
 
 const XAXIS_LABEL_OFFSET = -45;
 const YAXIS_LABEL_OFFSET = -370;

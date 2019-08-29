@@ -56,14 +56,16 @@ limitations under the License. -->
     </div>
     <!-- Contains elements shared between the graph and image views -->
     <div id="shared-container">
-      <!-- Toggle button -->
-      <button class="mdl-button
-           mdl-js-button
-           mdl-button--raised
-           mdl-button--colored"
-              id="switch-button">
-        GRAPH MODE
-      </button>
+      <!-- Tabs to switch modes -->
+      <div id="tab-container"
+           class="mdl-tabs mdl-js-tabs mdl-js-ripple-effect">
+        <div class="mdl-tabs__tab-bar">
+          <div id="tab-graph"
+               class="tab mdl-tabs__tab is-active">Graph</div>
+          <div id="tab-images"
+               class="tab mdl-tabs__tab">Images</div>
+        </div>
+      </div>
       <!-- History -->
       <div id="history-text">history</div>
       <div id="history-container">
