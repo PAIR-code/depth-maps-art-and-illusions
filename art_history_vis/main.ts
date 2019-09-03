@@ -17,15 +17,13 @@
 
 import {DepthPlotViewer} from './depthPlotViewer';
 import {PointCloudViewer} from './pointCloudViewer';
-import {
-  Painting, getImageContext, getStyleColor,
-  debounced, ART_STYLE_COLOR_MAP
-} from './util';
+import {ART_STYLE_COLOR_MAP, debounced, getImageContext, getStyleColor, Painting} from './util';
 
 
 // Constants
 const PAGE_LOAD_PAINTING_ID = 'rQE3Vym-EKB_9Q';
-const STORAGE_PATH = 'https://storage.googleapis.com/art_history_depth_data/GAC_images';
+const STORAGE_PATH =
+    'https://storage.googleapis.com/art_history_depth_data/GAC_images';
 const INPUT_FILENAME = 'input.png';
 const OUTPUT_FILENAME = 'output.png';
 const HISTORY_ELEMENT_CLASSNAME = 'history-element';
@@ -40,11 +38,14 @@ let idToPainting: {[id: string]: Painting};
 const depthMapElement = document.getElementById('depth-map');
 const originalPaintingElement = document.getElementById('original-painting');
 const depthPlotCanvasElement = document.getElementById('depth-plot-canvas');
-const depthPlotContainerElement = document.getElementById('depth-plot-container');
-const pointCloudContainerElement = document.getElementById('point-cloud-container');
+const depthPlotContainerElement =
+    document.getElementById('depth-plot-container');
+const pointCloudContainerElement =
+    document.getElementById('point-cloud-container');
 const pointCloudCanvasElement = document.getElementById('point-cloud-canvas');
 const outerContainerElement = document.getElementById('outer-container');
-const imageViewContainerElement = document.getElementById('image-view-container');
+const imageViewContainerElement =
+    document.getElementById('image-view-container');
 const historyContainer = document.getElementById('history-container');
 const imageViewWrapperElement = document.getElementById('image-view-wrapper');
 const tabGraphElement = document.getElementById('tab-graph');
@@ -57,16 +58,18 @@ const tabImagesElement = document.getElementById('tab-images');
  * Initializes the web visualization.
  * @param paintings an Array of the Painting objects (from the loaded data).
  */
-export function main(paintings: Array<Painting>, idToPaintingDict:
-  {[id: string]: Painting}) {
+export function main(
+    paintings: Array<Painting>, idToPaintingDict: {[id: string]: Painting}) {
   // Initializes three.js scenes for the depth plot and point cloud.
-  depthPlotViewer = new DepthPlotViewer(paintings,
-    depthPlotCanvasElement as HTMLCanvasElement,
-    outerContainerElement.clientWidth, outerContainerElement.clientHeight, false);
+  depthPlotViewer = new DepthPlotViewer(
+      paintings, depthPlotCanvasElement as HTMLCanvasElement,
+      outerContainerElement.clientWidth, outerContainerElement.clientHeight,
+      false);
 
   pointCloudViewer = new PointCloudViewer(
-    pointCloudCanvasElement as HTMLCanvasElement,
-    pointCloudContainerElement.clientWidth, pointCloudContainerElement.clientHeight, true);
+      pointCloudCanvasElement as HTMLCanvasElement,
+      pointCloudContainerElement.clientWidth,
+      pointCloudContainerElement.clientHeight, true);
 
   idToPainting = idToPaintingDict;
 
@@ -139,16 +142,15 @@ function addPaintingToImageView(painting: Painting) {
 
   // Create the image HTMLElement.
   const imageElement = document.createElement('img');
-  imageElement.src =
-    `${STORAGE_PATH}/${painting.imageid}/${INPUT_FILENAME}`;
+  imageElement.src = `${STORAGE_PATH}/${painting.imageid}/${INPUT_FILENAME}`;
   imageElement.onclick = imageClicked;
   gridImageContainer.appendChild(imageElement);
 
   // Create the text HTMLElement.
   const textDiv = document.createElement('div');
   textDiv.className = 'thumbnail-title';
-  textDiv.innerHTML =
-    `${painting.title} (${painting.year.toString()}) DR: ${painting.range.toString()}`;
+  textDiv.innerHTML = `${painting.title} (${painting.year.toString()}) DR: ${
+      painting.range.toString()}`;
   gridImageContainer.appendChild(textDiv);
 }
 
@@ -190,8 +192,8 @@ function initializeLegend() {
  */
 function initializeThumbnailImages() {
   // Info panel image loading
-  originalPaintingElement.crossOrigin = "Anonymous";
-  depthMapElement.crossOrigin = "Anonymous";
+  originalPaintingElement.crossOrigin = 'Anonymous';
+  depthMapElement.crossOrigin = 'Anonymous';
 
   // The point cloud should load after both DOM images have finished loading.
   // If the other image's load is complete, the image will call loadPointCloud
@@ -200,8 +202,7 @@ function initializeThumbnailImages() {
     if (depthMapElement.complete) {
       loadPointCloud();
     }
-  }
-  depthMapElement.onload = () => {
+  } depthMapElement.onload = () => {
     if (originalPaintingElement.complete) {
       loadPointCloud();
     }
@@ -213,24 +214,24 @@ function initializeThumbnailImages() {
  */
 function addEventHandlers() {
   // Reset button event handler
-  document.getElementById('reset-button').addEventListener('click',
-    () => {
-      // Reset the point cloud orbit control to original view.
-      pointCloudViewer.controls.reset();
-    });
+  document.getElementById('reset-button').addEventListener('click', () => {
+    // Reset the point cloud orbit control to original view.
+    pointCloudViewer.controls.reset();
+  });
 
 
   // Window resize event listener
-  window.addEventListener('resize', debounced(200, () => {
-    // Resize the depth plot's canvas to fit in the browser window.
-    const depthPlotContainer = outerContainerElement;
-    depthPlotViewer.resize(depthPlotContainer.clientWidth,
-      depthPlotContainer.clientHeight);
+  window.addEventListener(
+      'resize', debounced(200, () => {
+        // Resize the depth plot's canvas to fit in the browser window.
+        const depthPlotContainer = outerContainerElement;
+        depthPlotViewer.resize(
+            depthPlotContainer.clientWidth, depthPlotContainer.clientHeight);
 
-    // Resize the point cloud's canvas to fit in its DOM container.
-    const container = pointCloudContainerElement;
-    pointCloudViewer.resize(container.clientWidth, container.clientHeight);
-  }), false);
+        // Resize the point cloud's canvas to fit in its DOM container.
+        const container = pointCloudContainerElement;
+        pointCloudViewer.resize(container.clientWidth, container.clientHeight);
+      }), false);
 
 
   // Depth plot click event listener
@@ -250,8 +251,8 @@ function addEventHandlers() {
     // Switch to 'graph mode,' showing and updating the resize of the depth
     // plot and hiding the image view
     depthPlotContainerElement.style.display = 'block';
-    depthPlotViewer.resize(outerContainerElement.clientWidth,
-      outerContainerElement.clientHeight);
+    depthPlotViewer.resize(
+        outerContainerElement.clientWidth, outerContainerElement.clientHeight);
     imageViewContainerElement.style.display = 'none';
 
     tabGraphElement.classList.add('is-active');
@@ -282,26 +283,30 @@ function updateInfoImages(painting: Painting) {
 
   // Update displayed images
   document.getElementById('original-painting').src =
-    `${STORAGE_PATH}/${painting.imageid}/${INPUT_FILENAME}`;
+      `${STORAGE_PATH}/${painting.imageid}/${INPUT_FILENAME}`;
   document.getElementById('depth-map').src =
-    `${STORAGE_PATH}/${painting.imageid}/${OUTPUT_FILENAME}`;
+      `${STORAGE_PATH}/${painting.imageid}/${OUTPUT_FILENAME}`;
 
   // Reset the point cloud controls to the original view.
   pointCloudViewer.controls.reset();
 
   // Update painting details text
   document.getElementById('painting-title').innerHTML =
-    `<a target="_blank" href="${painting.asset_link}">${painting.title}"</a>`;
+      `<a target="_blank" href="${painting.asset_link}"
+            >${painting.title}"</a>`;
   document.getElementById('year-text').innerHTML =
-    'Year: '.bold() + painting.year.toString();
+      'Year: '.bold() + painting.year.toString();
   document.getElementById('style-text').innerHTML =
-    'Movement: '.bold() + painting.style;
+      'Movement: '.bold() + painting.style;
   document.getElementById('artist-text').innerHTML =
-    'Artist: '.bold() + painting.artist_name;
+      'Artist: '.bold() + painting.artist_name;
   document.getElementById('range-text').innerHTML =
-    'Depth Range: '.bold() + painting.range.toString();
+      'Depth Range: '.bold() + painting.range.toString();
   document.getElementById('partner-text').innerHTML =
-    'Source: '.bold() + painting.partner_name;
+      'Source: '.bold() + painting.partner_name;
+  document.getElementById('more-details').innerHTML =
+      `<a target="_blank" href="${painting.asset_link}"
+            ><b>More Details  <i class="material-icons">launch</i></b></a>`;
 }
 
 /**

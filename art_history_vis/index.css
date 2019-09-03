@@ -31,6 +31,10 @@ a {
   text-decoration-line: none;
 }
 
+.material-icons {
+  font-size: 15px;
+}
+
 a:hover {
   color: #00B8D4;
 }

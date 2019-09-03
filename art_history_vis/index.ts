@@ -29,11 +29,23 @@ d3.csv('paintings.csv').then((data: object) => {
   const idToPainting: {[id: string]: Painting} = {};
 
   for (let i = 0; i < data.length; i++) {
-    const link = data[i]['asset_link']
-    const imageid = link.split("/").pop();
-    const {asset_link, image, thumbnail, partner_name,
-      title, artist_name, year, location, art_movements, Depth,
-      range, range_difference, std_difference} = data[i];
+    const link = data[i]['asset_link'];
+    const imageid = link.split('/').pop();
+    const {
+      asset_link,
+      image,
+      thumbnail,
+      partner_name,
+      title,
+      artist_name,
+      year,
+      location,
+      art_movements,
+      Depth,
+      range,
+      range_difference,
+      std_difference
+    } = data[i];
     const painting = {
       asset_link: asset_link,
       image: image,
@@ -50,10 +62,9 @@ d3.csv('paintings.csv').then((data: object) => {
       range: range,
       range_difference: range_difference,
       std_difference: std_difference
-    }
+    };
     paintings.push(painting);
     idToPainting[imageid] = painting;
-
   }
   main(paintings, idToPainting);
 });
