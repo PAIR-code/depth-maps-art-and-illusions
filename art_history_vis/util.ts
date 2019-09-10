@@ -1,4 +1,3 @@
-import {Color} from "three";
 
 /**
  * @license
@@ -17,10 +16,11 @@ import {Color} from "three";
  * =============================================================================
  */
 
+
 // Constants
 export const ART_STYLE_COLOR_MAP: {[id: string]: number} = {
   'Baroque': 0xfc4e51,
-  'Renaissance': 0xc3ced0,
+  'Renaissance': 0x4287f5,
   'Romanticism': 0x1dabe6,
   'Realism': 0x1c366a,
   'Dutch Golden Age': 0xaf060f,
@@ -32,15 +32,16 @@ export const ART_STYLE_COLOR_MAP: {[id: string]: number} = {
   'Academic art': 0xff7c43,
   'Mannerism': 0xffa600,
   'Abstract art': 0xe43034,
-  'Ukiyo-e': 0x665191
+  'Ukiyo-e': 0x665191,
+  'Other': 0xc3ced0
 }
 
 /**
-* Represents a single painting from the GAC dataset.
-*/
+ * Represents a single painting from the GAC dataset.
+ */
 export interface Painting {
   imageid: string;
-  image: string,
+  image: string;
   partner_name: string;
   thumbnail: string;
   title: string;
@@ -78,8 +79,8 @@ export function getImageContext(image: HTMLImageElement) {
  * @param y a number that is the y position of the pixel.
  * @returns the ImageData object with RGB information for the pixel.
  */
-export function getPixelDataFromContext(context: CanvasRenderingContext2D,
-  x: number, y: number) {
+export function getPixelDataFromContext(
+    context: CanvasRenderingContext2D, x: number, y: number) {
   return context.getImageData(x, y, 1, 1).data;
 }
 
@@ -88,7 +89,7 @@ export function getPixelDataFromContext(context: CanvasRenderingContext2D,
  * @param style the string with the name of the style.
  */
 export function getStyleColor(style: string) {
-  return ART_STYLE_COLOR_MAP[style] || null;
+  return ART_STYLE_COLOR_MAP[style] || ART_STYLE_COLOR_MAP['Other'];
 }
 
 /**

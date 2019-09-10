@@ -139,17 +139,15 @@ export class DepthPlot {
       if (this.inGraphBounds(year)) {
         const style = paintings[i].style.split(', ')[0];
         const color = getStyleColor(style);
-        if (color != null) {
           const geometry = this.makePlotGeometry(paintings[i], i, year);
           const material = new THREE.MeshLambertMaterial({
-            color: color,
+            color,
             transparent: true,
             opacity: BLOCK_DEFAULT_OPACITY
           });
           const tip = new THREE.Mesh(geometry, material);
           this.blockToPainting[tip.uuid] = paintings[i];
           this.paintingsGroup.add(tip);
-        }
       }
     }
   }

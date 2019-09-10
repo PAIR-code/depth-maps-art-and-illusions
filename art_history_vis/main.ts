@@ -28,7 +28,7 @@ const INPUT_FILENAME = 'input.png';
 const OUTPUT_FILENAME = 'output.png';
 const HISTORY_ELEMENT_CLASSNAME = 'history-element';
 const MAX_HISTORY_LENGTH = 11;
-const IMAGE_LOADING_BATCH_SIZE = 60;
+const IMAGE_LOADING_BATCH_SIZE = 100;
 
 let depthPlotViewer: DepthPlotViewer;
 let pointCloudViewer: PointCloudViewer;
@@ -101,13 +101,13 @@ function updateUIVisibility() {
  * @param paintings an Array of the Painting objects (from the loaded data).
  */
 function initializeImageView(paintings: Array<Painting>) {
-  addPaintingsToImageView(paintings);
+  let idx = addPaintingsToImageView(paintings, 0);
 
   // Image Container scroll event listener
   imageViewContainerElement.addEventListener('scroll', (event: Event) => {
     const element = event.target as HTMLElement;
     if (element.scrollHeight - element.scrollTop === element.clientHeight) {
-      addPaintingsToImageView(paintings);
+      idx = addPaintingsToImageView(paintings, idx);
     }
   });
 }
@@ -115,19 +115,20 @@ function initializeImageView(paintings: Array<Painting>) {
 /**
  * Adds paintings to the image view.
  * @param paintings an Array of the Painting objects (from the loaded data).
+ * @param startIdx index of first painting not already in the visualization.
+ * @returns the index of the last added-index
  */
-function addPaintingsToImageView(paintings: Array<Painting>) {
-  let index = imageViewWrapperElement.children.length;
+function addPaintingsToImageView(
+    paintings: Array<Painting>, index: number): number {
   let paintingsAdded = 0;
   while (paintingsAdded < IMAGE_LOADING_BATCH_SIZE) {
-    const styles = paintings[index].style.split(', ');
-    const firstStyleColor = getStyleColor(styles[0]);
-    if (firstStyleColor != null && paintings[index].year > 0) {
+    if ( paintings[index].year > 0) {
       addPaintingToImageView(paintings[index]);
       paintingsAdded++;
     }
     index++;
   }
+  return index;
 }
 
 /**
@@ -293,7 +294,7 @@ function updateInfoImages(painting: Painting) {
   // Update painting details text
   document.getElementById('painting-title').innerHTML =
       `<a target="_blank" href="${painting.asset_link}"
-            >${painting.title}"</a>`;
+            >${painting.title}</a>`;
   document.getElementById('year-text').innerHTML =
       'Year: '.bold() + painting.year.toString();
   document.getElementById('style-text').innerHTML =
