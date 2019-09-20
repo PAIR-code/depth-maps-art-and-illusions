@@ -109,3 +109,24 @@ export function debounced(delayTime: number, delayedFunction: Function) {
     }, delayTime);
   }
 }
+/**
+ * Get the URL id parameter, and ensure that it's a key in the dictionary.
+ * @param dict the dictionary validate by.
+ * @param defaultVal the default value to return, if the id was not valid.
+ */
+export function getAndValidateURLID(
+    dict: {[id: string]: Painting}, defaultVal: string) {
+  const urlParams = new URLSearchParams(window.location.hash.substring(1));
+  const id = urlParams.get('id');
+  return id in dict ? id : defaultVal;
+}
+
+/**
+ * Set the URL id parameter.
+ * @param id id to set the url param with.
+ */
+export function setURLID(id: string) {
+  const urlParams = new URLSearchParams(window.location.search);
+  urlParams.set('id', id);
+  window.history.replaceState({}, '', `${location.pathname}?#${urlParams}`);
+}

@@ -17,7 +17,7 @@
 
 import {DepthPlotViewer} from './depthPlotViewer';
 import {PointCloudViewer} from './pointCloudViewer';
-import {ART_STYLE_COLOR_MAP, debounced, getImageContext, getStyleColor, Painting} from './util';
+import {ART_STYLE_COLOR_MAP, debounced, getAndValidateURLID, getImageContext, getStyleColor, Painting, setURLID} from './util';
 
 
 // Constants
@@ -79,7 +79,8 @@ export function main(
   initializeThumbnailImages();
   addEventHandlers();
 
-  updateInfoImages(idToPainting[PAGE_LOAD_PAINTING_ID]);
+  const id = getAndValidateURLID(idToPainting, PAGE_LOAD_PAINTING_ID);
+  updateInfoImages(idToPainting[id]);
 }
 
 /**
@@ -163,6 +164,7 @@ function addPaintingToImageView(painting: Painting) {
 function imageClicked(event: Event) {
   const clickImage = event.target;
   const imageid = clickImage.src.split('/')[5];
+  setURLID(imageid);
   updateInfoImages(idToPainting[imageid]);
 }
 
