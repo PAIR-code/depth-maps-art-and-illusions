@@ -122,7 +122,7 @@ function addPaintingsToImageView(
     paintings: Array<Painting>, index: number): number {
   let paintingsAdded = 0;
   while (paintingsAdded < IMAGE_LOADING_BATCH_SIZE) {
-    if ( paintings[index].year > 0) {
+    if (paintings[index].year > 0) {
       addPaintingToImageView(paintings[index]);
       paintingsAdded++;
     }

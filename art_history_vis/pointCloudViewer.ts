@@ -17,8 +17,9 @@
 
 import * as THREE from 'three';
 import {Points} from 'three/src/objects/Points.js';
-import * as viewer from './viewer';
+
 import * as util from './util';
+import * as viewer from './viewer';
 
 // Constants
 const X_TRANSLATE = -150;
@@ -56,11 +57,12 @@ export class PointCloudViewer extends viewer.Viewer {
    * The constructor for the InfoViewer class.
    * @param paintings an Array of Painting objects.
    */
-  constructor(canvas: HTMLCanvasElement, width: number, height: number,
-    enableRotate: boolean) {
+  constructor(
+      canvas: HTMLCanvasElement, width: number, height: number,
+      enableRotate: boolean) {
     super(canvas, width, height, enableRotate);
-    this.setCamera(CAMERA_POS_X, CAMERA_POS_Y, CAMERA_POS_Z,
-      CAMERA_FOCAL_LENGTH);
+    this.setCamera(
+        CAMERA_POS_X, CAMERA_POS_Y, CAMERA_POS_Z, CAMERA_FOCAL_LENGTH);
 
     this.scene.add(this.pointCloudGroup);
     this.makeBoundingGrid();
@@ -95,16 +97,19 @@ export class PointCloudViewer extends viewer.Viewer {
     const depthY = LINE_THICKNESS;
 
     for (let currZ = BOUNDING_GRID_START; currZ <= MAX_Z_DEPTH;
-      currZ += BOUNDING_GRID_INTERVAL) {
+         currZ += BOUNDING_GRID_INTERVAL) {
       // Horizontal lines on the bottom
-      this.makeLine(offsetXPosition, minYPosition, currZ + Z_OFFSET,
-        widthX, heightX, depthX);
+      this.makeLine(
+          offsetXPosition, minYPosition, currZ + Z_OFFSET, widthX, heightX,
+          depthX);
       // Horizontal lines on the top
-      this.makeLine(offsetXPosition, maxYPosition, currZ + Z_OFFSET,
-        widthX, heightX, depthX);
+      this.makeLine(
+          offsetXPosition, maxYPosition, currZ + Z_OFFSET, widthX, heightX,
+          depthX);
       // Vertical lines on the left
-      this.makeLine(minXPosition, offsetYPosition, currZ + Z_OFFSET,
-        widthY, heightY, depthY);
+      this.makeLine(
+          minXPosition, offsetYPosition, currZ + Z_OFFSET, widthY, heightY,
+          depthY);
     }
   }
 
@@ -122,14 +127,18 @@ export class PointCloudViewer extends viewer.Viewer {
     const height = LINE_THICKNESS;
     const depth = LINE_LENGTH_Z;
 
-    this.makeLine(minXPosition, minYPosition, zPosition,
-      width, height, depth);  // Lower left line
-    this.makeLine(maxXPosition, minYPosition, zPosition,
-      width, height, depth);  // Lower right line
-    this.makeLine(maxXPosition, maxYPosition, zPosition,
-      width, height, depth);  // Upper right line
-    this.makeLine(minXPosition, maxYPosition, zPosition,
-      width, height, depth);  // Upper left line
+    this.makeLine(
+        minXPosition, minYPosition, zPosition, width, height,
+        depth);  // Lower left line
+    this.makeLine(
+        maxXPosition, minYPosition, zPosition, width, height,
+        depth);  // Lower right line
+    this.makeLine(
+        maxXPosition, maxYPosition, zPosition, width, height,
+        depth);  // Upper right line
+    this.makeLine(
+        minXPosition, maxYPosition, zPosition, width, height,
+        depth);  // Upper left line
   }
 
   /**
@@ -141,38 +150,34 @@ export class PointCloudViewer extends viewer.Viewer {
    * @param height the height of the line.
    * @param depth the depth of the line.
    */
-  private makeLine(positionX: number, positionY: number, positionZ: number,
-    width: number, height: number, depth: number) {
+  private makeLine(
+      positionX: number, positionY: number, positionZ: number, width: number,
+      height: number, depth: number) {
     const geometry = new THREE.BoxBufferGeometry(width, height, depth);
     geometry.translate(
-      X_TRANSLATE + positionX,
-      Y_TRANSLATE + positionY,
-      Z_TRANSLATE + positionZ);
+        X_TRANSLATE + positionX, Y_TRANSLATE + positionY,
+        Z_TRANSLATE + positionZ);
     geometry.scale(X_SCALE, Y_SCALE, Z_SCALE);
     geometry.rotateY(POINT_CLOUD_ROTATE_Y);
 
-    const material = new THREE.MeshLambertMaterial({
-      color: LINE_COLOR,
-      transparent: true,
-      opacity: LINE_OPACITY
-    });
+    const material = new THREE.MeshLambertMaterial(
+        {color: LINE_COLOR, transparent: true, opacity: LINE_OPACITY});
     this.scene.add(new THREE.Mesh(geometry, material));
   }
 
   /**
    * Adds the depth image pixel points to the scene.
    */
-  public loadPointCloud(originalPaintingContext: CanvasRenderingContext2D,
-    depthMapContext: CanvasRenderingContext2D) {
+  loadPointCloud(
+      originalPaintingContext: CanvasRenderingContext2D,
+      depthMapContext: CanvasRenderingContext2D) {
     // Clear any existing point cloud geometry.
     this.pointCloudGroup.children = [];
+    const pointsGeometry =
+        this.updatePointsGeometry(originalPaintingContext, depthMapContext);
 
-    const pointsGeometry = this.updatePointsGeometry(originalPaintingContext,
-      depthMapContext);
-    const pointsMaterial = new THREE.PointsMaterial({
-      size: 4,
-      vertexColors: THREE.VertexColors
-    });
+    const pointsMaterial =
+        new THREE.PointsMaterial({size: 4, vertexColors: THREE.VertexColors});
     this.pointCloudGroup.add(new Points(pointsGeometry, pointsMaterial));
   }
 
@@ -183,42 +188,42 @@ export class PointCloudViewer extends viewer.Viewer {
    * @param depthMapContext a CanvasRenderingContext2D with the depth map's
    *    pixel information
    */
-  private updatePointsGeometry(originalPaintingContext: CanvasRenderingContext2D,
-    depthMapContext: CanvasRenderingContext2D) {
-
+  private updatePointsGeometry(
+      originalPaintingContext: CanvasRenderingContext2D,
+      depthMapContext: CanvasRenderingContext2D) {
     const positions = [];
     const colors = [];
 
+    const depthMapData = util.getPixelDataFromContext(
+        depthMapContext, 0, 0, POINT_CLOUD_WIDTH, POINT_CLOUD_HEIGHT);
+    const origPaintingData = util.getPixelDataFromContext(
+        originalPaintingContext, 0, 0, POINT_CLOUD_WIDTH, POINT_CLOUD_HEIGHT);
+
+    const numChannels = 4;
     for (let i = 0; i < POINT_CLOUD_WIDTH; i += 1) {
       for (let j = 1; j < POINT_CLOUD_HEIGHT; j += 1) {
-        const depthPixelData = util.getPixelDataFromContext(depthMapContext,
-          i, j);
-        const originalPixelData = util.getPixelDataFromContext(
-          originalPaintingContext, i, j);
+        const idx = (i * POINT_CLOUD_HEIGHT + j) * numChannels;
 
         // Add position data, with the depth value as the z position.
-        const x_position = i;
-        const y_position = POINT_CLOUD_HEIGHT - j;
-        const z_position = depthPixelData[0];
+        const xPosition = j;
+        const yPosition = POINT_CLOUD_HEIGHT - i;
+        const zPosition = depthMapData[idx];
         positions.push(
-          x_position * X_SCALE + X_TRANSLATE,
-          y_position * Y_SCALE + Y_TRANSLATE,
-          z_position * Z_SCALE + Z_TRANSLATE
-        );
+            xPosition * X_SCALE + X_TRANSLATE,
+            yPosition * Y_SCALE + Y_TRANSLATE,
+            zPosition * Z_SCALE + Z_TRANSLATE);
 
         // Use the color data from the original image
         colors.push(
-          originalPixelData[0] / 255.0,
-          originalPixelData[1] / 255.0,
-          originalPixelData[2] / 255.0
-        );
+            origPaintingData[idx] / 255.0, origPaintingData[idx + 1] / 255.0,
+            origPaintingData[idx + 2] / 255.0);
       }
     }
     const pointsGeometry = new THREE.BufferGeometry();
-    pointsGeometry.addAttribute('position',
-      new THREE.Float32BufferAttribute(positions, 3));
-    pointsGeometry.addAttribute('color',
-      new THREE.Float32BufferAttribute(colors, 3));
+    pointsGeometry.addAttribute(
+        'position', new THREE.Float32BufferAttribute(positions, 3));
+    pointsGeometry.addAttribute(
+        'color', new THREE.Float32BufferAttribute(colors, 3));
     pointsGeometry.rotateY(POINT_CLOUD_ROTATE_Y);
 
     return pointsGeometry;

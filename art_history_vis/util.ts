@@ -80,8 +80,8 @@ export function getImageContext(image: HTMLImageElement) {
  * @returns the ImageData object with RGB information for the pixel.
  */
 export function getPixelDataFromContext(
-    context: CanvasRenderingContext2D, x: number, y: number) {
-  return context.getImageData(x, y, 1, 1).data;
+    context: CanvasRenderingContext2D, x = 0, y = 0, width = 1, height = 1) {
+  return context.getImageData(x, y, width, height).data;
 }
 
 /**
