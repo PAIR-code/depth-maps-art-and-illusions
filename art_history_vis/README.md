@@ -1,8 +1,7 @@
 ### Art history visualization
 This is a visualization to qualitatively explore the depth interpretations of a database of art history images with an interactive visualization by [PAIR](https://ai.google/research/teams/brain/pair)
 
-See the live demo here:
-[TODO put demo here](https://ai.google/research/teams/brain/pair)
+See the live demo [here](https://storage.googleapis.com/art_history_depth_data/demo/index.html)
 
 ```
 ### To run the demo

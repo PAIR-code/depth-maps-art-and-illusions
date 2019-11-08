@@ -52,6 +52,11 @@ img.sidegifs {
   flex: 0 0 50%;
 }
 
+.img-flat {
+  height: auto !important;
+  width: auto !important;
+}
+
 #topbar-img {
   border: none;
   width: 1100px;
