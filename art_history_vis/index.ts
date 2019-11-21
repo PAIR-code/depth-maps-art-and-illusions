@@ -47,24 +47,27 @@ d3.csv('paintings.csv').then((data: object) => {
       std_difference
     } = data[i];
     const painting = {
-      asset_link: asset_link,
-      image: image,
-      thumbnail: thumbnail,
-      partner_name: partner_name,
-      year: year,
+      asset_link,
+      image,
+      thumbnail,
+      partner_name,
+      year,
       depth: Depth,
       style: art_movements,
-      imageid: imageid,
-      title: title,
-      artist_name: artist_name,
-      location: location,
-      art_movements: art_movements,
-      range: range,
-      range_difference: range_difference,
-      std_difference: std_difference
+      imageid,
+      title,
+      artist_name,
+      location,
+      art_movements,
+      range,
+      range_difference,
+      std_difference
     };
-    paintings.push(painting);
-    idToPainting[imageid] = painting;
+    if (partner_name === 'The Metropolitan Museum of Art'|| partner_name  === 'Rijksmuseum'){
+      paintings.push(painting);
+      idToPainting[imageid] = painting;
+    }
   }
+  console.log(paintings.length);
   main(paintings, idToPainting);
 });

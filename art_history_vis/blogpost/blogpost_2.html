@@ -1,0 +1,203 @@
+<!-- Copyright 2019 Google LLC
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    https://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. -->
+
+<html>
+
+<head>
+  <link rel="icon"
+        type="image/png"
+        href="./icon.png">
+  <link rel="stylesheet"
+        href="index.css">
+  <meta charset="utf-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+  <meta property="og:title"
+        content="Depth in Art History Visualization">
+  <meta property="og:image"
+        content="header.png">
+  <meta name="twitter:card"
+        content="summary_large_image">
+
+  <title>Illusions for depth models and illusions for humans
+  </title>
+</head>
+
+<body>
+  <div
+       style="visibility: hidden; overflow: hidden; position: absolute; top: 0px; height: 1px; width: auto; padding: 0px; border: 0px; margin: 0px; text-align: left; text-indent: 0px; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal;">
+    <div id="MathJax_Hidden"></div>
+  </div>
+  <div id="MathJax_Message"
+       style="display: none;"></div>
+  <div id="header"
+       style="height: 100px;">
+    <img src='images/waterfall-large.png'>
+    <div>
+      <h1 style="margin-top:20px; margin-bottom:20px">Illusions for depth models and illusions for
+        humans
+      </h1>
+    </div>
+
+    <div style="color:#999;font-style:italic">
+      By Ellen Jiang, Emily Reif, and Been Kim on <a target='blank'
+         href='https://ai.google/research/teams/brain/pair'>PAIR</a>
+      <br>
+      <br>
+      This is the second of two posts (first is <a href='./blogpost_1.html'
+         target='_blank'>here</a>) that accompany our <a target="blank"
+         href="https://github.com/PAIR-code/depth-maps-art-and-illusions">open-sourced</a>
+      <a target="blank"
+         href="https://storage.googleapis.com/art_history_depth_data/demo/index.html">visualization</a>.
+    </div>
+    <p>
+      As explored in our <a href='./blogpost_1.html'
+         target='_blank'>previous post</a>, models that predict depth can be difficult to debug and
+      understand. One way we can start to shed some light on their inner workings it to see when
+      they fail (or do not fail) in interesting ways. In this blogpost, we explore this in two ways.
+    </p>
+    <p>
+      The first is through 3D visual illusions. These images, popularized by M.C. Escher in the
+      1900s, have fascinated us with their ability to force us into a state of cognitive dissonance.
+      As with the images below, they look locally correct, but are physically impossible-- no true
+      depth map can exist for them. This makes them interesting test cases for depth map models,
+      which are forced to create a global depth map.
+    </p>
+    <p>
+      We also experiment with a different kind of “designed to confuse” image: programmatically
+      generated adversarial images. These adversarial attack images have been created for many types
+      of image models, and indeed are possible to create for depth map models as well.
+    </p>
+    <h2>Other Out-of-Distribution Images</h2>
+    <h3>Optical Illusions</h3>
+    <div class='img-holder'>
+      <img src='images/escher_waterfall.jpg'>
+      <img src='images/waterfall_depth.png'>
+    </div>
+    <div class='caption'>Waterfall, Escher, 1961 (<a target="blank"
+         href="https://www.mcescher.com/gallery/recognition-success/waterfall/">source</a>)</div>
+    <div class='img-holder'>
+      <img src='images/cube.png'>
+      <img src='images/cube depth.png'>
+    </div>
+    <div class='caption'>Impossible box(<a target="blank"
+         href="https://wpclipart.com/signs_symbol/optical_illusions/impossible_objects/impossible_box.jpg.html">source</a>)
+    </div>
+    <p>
+      For these experiments, we use a model similar to <a
+         href='https://ai.google/research/pubs/pub46965'
+         target='_blank'>this one</a>, which learned to interpret 3D
+      shapes by observing tens of thousands of scenes shot with a moving camera.
+    </p>
+    <p>
+      In the context of depth prediction, <a target="blank"
+         href="https://en.wikipedia.org/wiki/Impossible_object">impossible object illusions</a>
+      are another set of interesting
+      image examples. For example, in the image above, the water is simultaneously flowing away
+      from
+      the
+      wheel along the trough, but also back toward the waterfall, which is directly above the
+      wheel
+      (there are also a few other hidden impossibilities in the picture).
+    </p>
+    <p>
+      These images purposefully depict physically impossible objects or spaces, so no true depth
+      map
+      can exist. How, then, will the model react when it is forced to make a depth prediction?
+      Will
+      it
+      look at local edges or try to glean some global structure from the image? It’s hard to
+      quantitatively analyze this or make a generalizable conclusion, but from this example of an
+      Escher print, the model does seem to be trying to impose some sort of global structure on the
+      image. That is, the water trough does seem to be interpreted as a single cohesive element
+      which uniformly moves into the background, rather than being bent to satisfy the constraint of
+      the towers. Similarly, in the impossible cube, the model does not try to reconcile the
+      crossing bars by bending them, but instead just sees the front bar as having a
+      conveniently-sized gap where the other crosses it. Again, though, these are just anecdotes-- a
+      further quantifiable analysis would be interesting future work.
+    </p>
+
+
+    <h3>Generating Adversarial Examples</h3>
+    <p>
+      In addition to explorations of impossible object illusions, we were also curious about another
+      kind of image that’s outside the model’s training distribution: generated adversarial
+      examples.
+    </p>
+    <p>
+      We generated adversarial examples for depth models using the standard gradient descent
+      approach (see generation script <a target="blank"
+         href="https://github.com/PAIR-code/depth-maps-art-and-illusions/tree/master/adversarial">here</a>).
+      These experiments were done using this
+      <a target="blank"
+         href="https://github.com/ialhashim/DenseDepth">open-source DenseDepth model</a>.
+    </p>
+    <p>
+      In one example, we started with this image of a bathroom sink (left), which produces the
+      corresponding depth map (middle), and we tried to manipulate the input image so that the
+      output
+      depth map was that of the bathtub (right).
+    </p>
+    <div class='img-holder'>
+      <img src='images/adversarial_original_input.png'>
+      <img src='images/adversarial_original_output.png'>
+      <img src='images/adversarial_target_output.png'>
+    </div>
+    <div class='captions-holder'>
+      <div class='caption'>Original image</div>
+      <div class='caption'>Depth map of original image</div>
+      <div class='caption'>Target depth map</div>
+    </div>
+    <p>
+      We ran gradient descent, altering the image input to with the loss as the mean-squared error
+      of
+      the difference between the generated depth output and the target depth output. After 250
+      iterations with a step size of .001, we generated the following:
+    </p>
+    <div class='img-holder'>
+      <img src='images/adversarial_original_input.png'>
+      <img src='images/adversarial_generated_input.png'>
+      <img src='images/adversarial_generated_output.png'>
+    </div>
+    <div class='captions-holder'>
+      <div class='caption'>Original image</div>
+      <div class='caption'>Manpulated image</div>
+      <div class='caption'>Depth map of manipulated image</div>
+    </div>
+    <p>
+      Indeed, we were able to generate images that look very similar to the human eye, but which
+      produce dramatically different output depth maps. As with all models prone to adversarial
+      attacks, this is concerning, and doubly so here with the frequent use case of depth map models
+      in self-driving cars (examples <a
+         href='http://ai.stanford.edu/~asaxena/rccar/ICML_ObstacleAvoidance.pdf'>here</a> and <a
+         herf='http://yann.lecun.com/exdb/publis/pdf/hadsell-jfr-09.pdf'>here</a>) and other systems
+      that interact directly with
+      the physical world.
+    </p>
+    <h2>Conclusion</h2>
+    <p>
+      Exploring the failure cases of a model can shed light on its performance, revealing potential
+      vulnerabilities, pathologies, and even explanations for its inner workings. In this blogpost,
+      we explore two types of out-of-distribution images, illusions and manually created adversarial
+      examples, and see how we can learn from the model’s performance on them.
+    </p>
+    <h2>Thanks!</h2>
+    <div style="color:#999;font-style:italic;padding-bottom:30px;">
+      Thanks to Martin Wattenberg, Fernanda Viegas, Noah Snavely, Richard Tucker, D. Sculley, and
+      Jasper Snoek for their help, feedback,
+      and editing.
+    </div>
+</body>
+
+</html>
