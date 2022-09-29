@@ -12,7 +12,7 @@
     "@material/slider": "^2.3.0",
     "@material/typography": "^2.3.0",
     "@types/d3": "^5.7.0",
-    "d3": "^5.9.1",
+    "d3": "^7.6.1",
     "flask": "^0.2.10",
     "keras": "^1.0.1",
     "three": "^0.125.0",
