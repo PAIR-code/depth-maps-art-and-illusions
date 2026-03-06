@@ -26,11 +26,10 @@ yarn
 yarn build
 
 echo "Deploying..."
-gsutil mkdir -p gs://art_history_depth_data/demo
-gsutil -m cp static/* gs://art_history_depth_data/demo
+gcloud storage cp -r static/* gs://art_history_depth_data/demo
 
 echo "Setting cache control to private..."
-gsutil -m setmeta -h "Cache-Control:private" "gs://art_history_depth_data/**.html"
-gsutil -m setmeta -h "Cache-Control:private" "gs://art_history_depth_data/**.css"
-gsutil -m setmeta -h "Cache-Control:private" "gs://art_history_depth_data/**.js"
+gcloud storage objects update "gs://art_history_depth_data/**.html" --cache-control="private"
+gcloud storage objects update "gs://art_history_depth_data/**.css" --cache-control="private"
+gcloud storage objects update "gs://art_history_depth_data/**.js" --cache-control="private"
 
